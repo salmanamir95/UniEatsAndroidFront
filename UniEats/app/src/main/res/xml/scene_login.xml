@@ -1,0 +1,25 @@
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetStart="@id/start"
+        motion:constraintSetEnd="@id/end"
+        motion:duration="800">
+        <OnClick motion:targetId="@id/loginButton" motion:clickAction="transitionToEnd" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@id/logo" android:alpha="0" motion:translationY="-100" />
+        <Constraint android:id="@id/emailInputLayout" android:alpha="0" motion:translationY="100" />
+        <Constraint android:id="@id/passwordInputLayout" android:alpha="0" motion:translationY="100" />
+        <Constraint android:id="@id/loginButton" android:alpha="0" motion:translationY="100" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@id/logo" android:alpha="1" motion:translationY="0" />
+        <Constraint android:id="@id/emailInputLayout" android:alpha="1" motion:translationY="0" />
+        <Constraint android:id="@id/passwordInputLayout" android:alpha="1" motion:translationY="0" />
+        <Constraint android:id="@id/loginButton" android:alpha="1" motion:translationY="0" />
+    </ConstraintSet>
+
+</MotionScene>
