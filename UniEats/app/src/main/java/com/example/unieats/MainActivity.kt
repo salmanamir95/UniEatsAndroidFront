@@ -5,7 +5,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.unieats.FragmentFactory.Fmake
+import com.example.unieats.Login.LoginFragment
 import com.example.unieats.R
 
 class MainActivity : AppCompatActivity() {
@@ -19,11 +19,14 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        Fmake.loadFragment(
-            fragmentManager = supportFragmentManager,
-            containerId = R.id.fragment_container,
-            fragmentClassName = "com.example.unieats.Login.LoginFragment",
-            data = null
-        )
+        if (savedInstanceState == null) { // Ensures fragment is loaded only once
+            loadFragment(LoginFragment())
+        }
+
+    }
+    private fun loadFragment(fragment: androidx.fragment.app.Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment) // Make sure container ID matches
+        transaction.commit()
     }
 }
