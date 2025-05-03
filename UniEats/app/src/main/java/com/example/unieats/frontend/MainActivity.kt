@@ -1,11 +1,12 @@
-package com.example.unieats
+package com.example.unieats.frontend
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.unieats.login.loginFragment
+import com.example.unieats.R
+import com.example.unieats.frontend.login.loginFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
