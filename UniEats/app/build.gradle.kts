@@ -3,7 +3,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.services)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -42,7 +42,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    implementation(libs.firebase.auth)
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-analytics")
     implementation(libs.firebase.database)
-    implementation(libs.firebase.analytics)
+    implementation(libs.androidx.room.runtime.android)
+
 }

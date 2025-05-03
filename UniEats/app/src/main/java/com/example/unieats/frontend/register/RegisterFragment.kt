@@ -12,6 +12,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
+import com.example.unieats.backend.repository.UserRepository
 import com.example.unieats.frontend.login.loginFragment
 
 class RegisterFragment : Fragment() {
@@ -60,7 +61,54 @@ class RegisterFragment : Fragment() {
             val trans = parentFragmentManager.beginTransaction()
             trans.replace(R.id.fragment_container, loginFragment()) // Make sure container ID matches
             trans.commit()
+            }
         }
+        val regBtn = view.findViewById<Button>(R.id.regBtnreg)
+        regBtn?.let{
+            btn -> btn.setOnClickListener(){
+            val repository = UserRepository()
+
+            var email = view.findViewById<EditText>(R.id.emailReg).text.toString()
+            var pass = view.findViewById<EditText>(R.id.passReg).text.toString()
+            var designation = design
+            var age = view.findViewById<EditText>(R.id.ageReg).text.toString().toInt()
+            var name = view.findViewById<EditText>(R.id.nameReg).text.toString()
+            if (email.isNullOrEmpty() || pass.isNullOrEmpty() || designation.isNullOrEmpty()
+                || age.toString().isNullOrEmpty() || name.isNullOrEmpty())
+            {
+                Toast.makeText(context, "Complete All fields", Toast.LENGTH_SHORT)
+            }
+            else if (!email.matches(emailPattern.toRegex()))
+            {
+                Toast.makeText(context, "Write correct Email", Toast.LENGTH_SHORT)
+            }
+            else if (!pass.matches(passwordPattern.toRegex()))
+            {
+                Toast.makeText(context, "Minimum 6 character Password", Toast.LENGTH_SHORT)
+            }
+            else if (age<=16 && age>=80)
+            {
+                Toast.makeText(context, "Correct Age 17<= age <= 79", Toast.LENGTH_SHORT)
+            }else {
+                val user = Register(
+                    email, pass, designation, age, name
+                )
+                repository.registerUser(
+                    user,
+                    onSuccess = {
+                        Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                        // Optionally navigate to login screen
+                        val trans = parentFragmentManager.beginTransaction()
+                        trans.replace(R.id.fragment_container, loginFragment()) // Make sure container ID matches
+                        trans.commit()
+                    },
+                    onFailure = {
+                        Toast.makeText(context, "Failed: ${it.message}", Toast.LENGTH_LONG).show()
+                    }
+                )
+            }
+
+            }
         }
     }
 }
