@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
+import com.example.unieats.frontend.login.loginFragment
 
 class RegisterFragment : Fragment() {
 
@@ -50,6 +52,15 @@ class RegisterFragment : Fragment() {
                 Toast.makeText(context, "Designation assigned as: " + design, Toast.LENGTH_SHORT ).show()
             }
 
+        }
+        var logBtn = view.findViewById<Button>(R.id.logreg)
+
+        logBtn?.let{
+                btn -> btn.setOnClickListener(){
+            val trans = parentFragmentManager.beginTransaction()
+            trans.replace(R.id.fragment_container, loginFragment()) // Make sure container ID matches
+            trans.commit()
+        }
         }
     }
 }

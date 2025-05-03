@@ -45,6 +45,25 @@
         android:layout_height="wrap_content"
         android:id="@+id/designReg"
         android:spinnerMode="dropdown"
-        android:layout_below="@id/passReg"/>
+        android:layout_below="@id/ageReg"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:id="@+id/regBtnreg"
+        android:layout_below="@+id/designReg"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/regBtnreg"
+        android:id="@+id/logreg"
+        android:text="Wanna Go for Login in?"
+        />
+
+
+
 
 </RelativeLayout>
