@@ -5,8 +5,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.unieats.Login.LoginFragment
-import com.example.unieats.R
+import com.example.unieats.login.loginFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +19,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         if (savedInstanceState == null) { // Ensures fragment is loaded only once
-            loadFragment(LoginFragment())
+            loadFragment(loginFragment())
         }
 
     }
