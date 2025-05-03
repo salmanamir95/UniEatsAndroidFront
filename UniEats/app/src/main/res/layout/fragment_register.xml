@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to UniEats! We make campus dining easy — order, manage, and enjoy your meals with just a few clicks."
+        android:id="@+id/tvWelcome"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvWelcome"
+        android:hint="Enter Email"
+        android:id="@+id/emailReg"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/emailReg"
+        android:id="@+id/passReg"
+        android:hint="Password"
+        android:inputType="textPassword"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/nameReg"
+        android:hint="Full Name"
+        android:layout_below="@+id/passReg"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ageReg"
+        android:hint="age"
+        android:inputType="number"
+        android:layout_below="@+id/nameReg"/>
+
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/designReg"
+        android:spinnerMode="dropdown"
+        android:layout_below="@id/passReg"/>
+
+</RelativeLayout>
