@@ -3,15 +3,21 @@ package com.example.unieats.backend.models
 import com.example.unieats.frontend.register.Register
 
 data class User(
-    val id: Int? = null,
-    val email: String? = null,
-    val password: String? = null,
-    val designation: String? = null,
-    val age: Int? = null
-){
+    val id: String = "",
+    val email: String = "",
+    val name: String = "",
+    val age: Int = 0,
+    val designation: String = ""
+) {
     companion object {
-        fun fromRegistertoUser(register: Register, id: Int): User {
-            return User(id, register.email, register.pass, register.designation, register.age)
+        fun fromRegistertoUser(register: Register, id: String): User {
+            return User(
+                id = id,
+                email = register.email,
+                name = register.name,
+                age = register.age,
+                designation = register.designation
+            )
         }
     }
 }

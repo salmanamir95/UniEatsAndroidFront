@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
+import com.example.unieats.backend.repository.UserRepository
 import com.example.unieats.frontend.register.RegisterFragment
 
 class loginFragment: Fragment() {
@@ -16,6 +17,27 @@ class loginFragment: Fragment() {
     private lateinit var pass : String
     private lateinit var logBtn : Button
     private lateinit var regBtn : Button
+
+    private fun validateInputs(email: String, password: String): Boolean {
+        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
+        val passwordPattern = ".{6,}".toRegex()
+
+        return when {
+            email.isEmpty() || password.isEmpty() -> {
+                Toast.makeText(context, "Complete the Required Fields", Toast.LENGTH_SHORT).show()
+                false
+            }
+            !email.matches(emailPattern) -> {
+                Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
+                false
+            }
+            !password.matches(passwordPattern) -> {
+                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                false
+            }
+            else -> true
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,28 +49,20 @@ class loginFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logBtn = view.findViewById(R.id.loginBtn)
         regBtn = view.findViewById(R.id.regBtn)
-        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
-        val passwordPattern = ".{6,}"
-
+        logBtn = view.findViewById(R.id.loginBtn)
         logBtn.setOnClickListener {
-            email = view.findViewById<EditText>(R.id.email).text.toString().trim()
-            pass = view.findViewById<EditText>(R.id.pass).text.toString().trim()
+            val email = view.findViewById<EditText>(R.id.email).text.toString().trim()
+            val password = view.findViewById<EditText>(R.id.pass).text.toString().trim()
 
-            if (email.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(context, "Complete the Required Fields", Toast.LENGTH_SHORT).show()
-            } else if (!email.matches(emailPattern.toRegex())) {
-                Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
-            } else if (!pass.matches(passwordPattern.toRegex())) {
-                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-            } else {
-                // Call login
-                val repository = com.example.unieats.backend.repository.UserRepository()
-                repository.loginUser(email, pass,
+            if (validateInputs(email, password)) {
+                val repository = UserRepository()
+                repository.loginUser(
+                    email = email,
+                    password = password,
                     onSuccess = { user ->
-                        Toast.makeText(context, "Welcome ${user.email}", Toast.LENGTH_LONG).show()
-                        // TODO: Navigate to home screen or user dashboard here
+                        Toast.makeText(context, "Welcome ${user.name}", Toast.LENGTH_LONG).show()
+                        // Add navigation logic here
                     },
                     onFailure = { errorMsg ->
                         Toast.makeText(context, "Login failed: $errorMsg", Toast.LENGTH_LONG).show()
@@ -57,13 +71,11 @@ class loginFragment: Fragment() {
             }
         }
 
-
-        regBtn?.let{
-            btn -> btn.setOnClickListener(){
-            val trans = parentFragmentManager.beginTransaction()
-            trans.replace(R.id.fragment_container, RegisterFragment()) // Make sure container ID matches
-            trans.commit()
-            }
+        regBtn.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, RegisterFragment())
+                .addToBackStack(null)
+                .commit()
         }
     }
 }

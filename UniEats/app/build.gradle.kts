@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,14 @@ plugins {
 }
 
 android {
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            load(localPropertiesFile.inputStream())
+        } else {
+            throw GradleException("local.properties file not found!")
+        }
+    }
     namespace = "com.example.unieats"
     compileSdk = 35
 
@@ -14,6 +24,14 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        val clientId = localProperties.getProperty("defaultWebClientId")
+
+        if (clientId.isNullOrBlank()) {
+            throw GradleException("defaultWebClientId is not defined in local.properties")
+        } else {
+            resValue("string", "default_web_client_id", clientId)
+        }
     }
 
     buildTypes {
@@ -36,6 +54,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -48,6 +67,10 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth.ktx)
+
+    // Google Sign-In
+    implementation ("com.google.android.gms:play-services-auth:21.0.0")
 
     // Room
     implementation(libs.androidx.room.runtime.android)
