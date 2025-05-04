@@ -32,31 +32,31 @@ class loginFragment: Fragment() {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
         val passwordPattern = ".{6,}"
 
-        logBtn?.let { button ->
-            button.setOnClickListener {
-                email = view.findViewById<EditText>(R.id.email).text.toString()
-                pass = view.findViewById<EditText>(R.id.pass).text.toString()
+        logBtn.setOnClickListener {
+            email = view.findViewById<EditText>(R.id.email).text.toString().trim()
+            pass = view.findViewById<EditText>(R.id.pass).text.toString().trim()
 
-                if (email.isNullOrEmpty() || pass.isNullOrEmpty())
-                    Toast.makeText(context, "Complete the Required Fields", Toast.LENGTH_SHORT).show()
-                else {
-                    if (email.matches(emailPattern.toRegex())) {
-                        if (pass.matches((passwordPattern.toRegex()))) {
-                            Toast.makeText(context, "Correct", Toast.LENGTH_SHORT).show()
-                        }
-                        else{
-                            Toast.makeText(context, "Password Pattern is wrong",Toast.LENGTH_SHORT).show()
-                        }
+            if (email.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(context, "Complete the Required Fields", Toast.LENGTH_SHORT).show()
+            } else if (!email.matches(emailPattern.toRegex())) {
+                Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
+            } else if (!pass.matches(passwordPattern.toRegex())) {
+                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+            } else {
+                // Call login
+                val repository = com.example.unieats.backend.repository.UserRepository()
+                repository.loginUser(email, pass,
+                    onSuccess = { user ->
+                        Toast.makeText(context, "Welcome ${user.email}", Toast.LENGTH_LONG).show()
+                        // TODO: Navigate to home screen or user dashboard here
+                    },
+                    onFailure = { errorMsg ->
+                        Toast.makeText(context, "Login failed: $errorMsg", Toast.LENGTH_LONG).show()
                     }
-                    else{
-                        Toast.makeText(context, "Email Pattern is wrong",Toast.LENGTH_SHORT).show()
-                    }
-
-                }
-
+                )
             }
-
         }
+
 
         regBtn?.let{
             btn -> btn.setOnClickListener(){
