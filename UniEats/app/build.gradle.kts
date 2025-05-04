@@ -1,9 +1,7 @@
-// App-level build.gradle (build.gradle in app folder)
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -21,7 +19,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -42,9 +43,12 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
-    implementation(libs.androidx.room.runtime.android)
+    implementation(libs.firebase.firestore)
 
+    // Room
+    implementation(libs.androidx.room.runtime.android)
 }
