@@ -63,6 +63,7 @@ class loginFragment: Fragment() {
                     onSuccess = { user ->
                         Toast.makeText(context, "Welcome ${user.name}", Toast.LENGTH_LONG).show()
                         // Add navigation logic here
+
                     },
                     onFailure = { errorMsg ->
                         Toast.makeText(context, "Login failed: $errorMsg", Toast.LENGTH_LONG).show()
