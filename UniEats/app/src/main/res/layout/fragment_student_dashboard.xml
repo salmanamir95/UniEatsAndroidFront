@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,20 +10,19 @@
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/student_top_bar"
-        android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:padding="16dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_profile"
-            android:contentDescription="Profile"
-            android:layout_gravity="end" />
+            android:contentDescription="Profile" />
 
         <TextView
             android:id="@+id/title"
@@ -31,65 +31,26 @@
             android:text="Student Dashboard"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_gravity="center"
             android:layout_marginStart="16dp" />
     </LinearLayout>
 
-    <!-- Main Content -->
+    <!-- Content Fragment (Home, Orders, etc.) -->
     <FrameLayout
-        android:id="@+id/fragment_student_nav_bar"
+        android:id="@+id/fragment_student_content_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/student_top_bar"
+        app:layout_constraintTop_toBottomOf="@id/student_top_bar"
+        app:layout_constraintBottom_toTopOf="@id/fragment_student_navbar_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
-
-    <!-- Bottom Navigation Bar -->
-    <LinearLayout
-        android:id="@+id/navigation_bar"
-        android:orientation="horizontal"
+    <!-- Navbar Fragment (bottom bar with buttons) -->
+    <FrameLayout
+        android:id="@+id/fragment_student_navbar_container"
         android:layout_width="0dp"
-        android:layout_height="56dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:background="#FFFFFF"
-        android:gravity="center"
-        android:padding="8dp">
-
-        <ImageView
-            android:id="@+id/home_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_home"
-            android:contentDescription="Home"
-            android:layout_marginEnd="16dp" />
-
-        <ImageView
-            android:id="@+id/orders_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_orders"
-            android:contentDescription="Orders"
-            android:layout_marginEnd="16dp" />
-
-        <ImageView
-            android:id="@+id/payments_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_payments"
-            android:contentDescription="Payments"
-            android:layout_marginEnd="16dp" />
-
-        <ImageView
-            android:id="@+id/profile_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_profile"
-            android:contentDescription="Profile" />
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
