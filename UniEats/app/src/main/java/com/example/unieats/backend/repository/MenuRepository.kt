@@ -1,11 +1,13 @@
 package com.example.unieats.backend.repository
 
 import android.net.Uri
-import com.example.unieats.backend.models.MenuItem
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.unieats.backend.dbData.MenuItem
+import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-
 
 class MenuRepository {
 
@@ -13,6 +15,10 @@ class MenuRepository {
     private val menuRef = database.getReference("menu")  // Firebase Realtime Database reference for menu items
     private val storage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference.child("menu_images") // Firebase Storage reference for images
+
+    // LiveData to hold the list of MenuItemModels
+    private val _menuItemsLiveData = MutableLiveData<List<MenuItemModel>>()
+    val menuItemsLiveData: LiveData<List<MenuItemModel>> get() = _menuItemsLiveData
 
     // CREATE: Add a new menu item with an image
     fun addMenuItem(menuItem: MenuItem, imageUri: Uri, callback: (Boolean) -> Unit) {
@@ -44,17 +50,23 @@ class MenuRepository {
         } ?: callback(false)  // Failed to generate unique ID
     }
 
-    // READ: Fetch the list of all menu items (including image URL)
-    fun getMenuItems(callback: (List<MenuItem>) -> Unit) {
+    // READ: Fetch the list of all menu items (convert to MenuItemModel with image)
+    fun getMenuItems() {
         menuRef.get().addOnSuccessListener { snapshot ->
-            val menuItems = mutableListOf<MenuItem>()
+            val menuItems = mutableListOf<MenuItemModel>()
             for (child in snapshot.children) {
                 val menuItem = child.getValue(MenuItem::class.java)
-                menuItem?.let { menuItems.add(it) }
+                menuItem?.let {
+                    // Convert each MenuItem to MenuItemModel with image (Bitmap)
+                    MenuItemModel.toMenuItemModel(it) { menuItemModel ->
+                        menuItems.add(menuItemModel)
+                    }
+                }
             }
-            callback(menuItems)  // Send the fetched items back to the fragment
+            // Update LiveData with the list of MenuItemModel
+            _menuItemsLiveData.postValue(menuItems)  // Post the value to LiveData
         }.addOnFailureListener {
-            callback(emptyList())  // If failed to fetch data, return an empty list
+            _menuItemsLiveData.postValue(emptyList())  // If failed to fetch data, post an empty list
         }
     }
 

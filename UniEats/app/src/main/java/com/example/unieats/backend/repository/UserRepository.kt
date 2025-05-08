@@ -1,6 +1,6 @@
 package com.example.unieats.backend.repository
 
-import com.example.unieats.backend.models.User
+import com.example.unieats.backend.dbData.User
 import com.example.unieats.frontend.register.Register
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase

@@ -1,4 +1,4 @@
-package com.example.unieats.backend.models
+package com.example.unieats.backend.dbData
 
 import com.example.unieats.frontend.register.Register
 

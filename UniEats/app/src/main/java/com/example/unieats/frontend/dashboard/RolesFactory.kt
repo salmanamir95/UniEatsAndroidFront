@@ -1,16 +1,12 @@
 package com.example.unieats.frontend.dashboard
 
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
-import android.provider.ContactsContract.CommonDataKinds.Email
 import androidx.fragment.app.FragmentManager
 import com.example.unieats.R
-import com.example.unieats.backend.models.User
+import com.example.unieats.backend.dbData.User
 import com.example.unieats.frontend.dashboard.admin.AdminFragment
 import com.example.unieats.frontend.dashboard.staff.StaffFragment
 import com.example.unieats.frontend.dashboard.student.StudentFragment
-import com.example.unieats.frontend.register.RegisterFragment
 import java.io.Serializable
 
 sealed class AppUser : Serializable {
