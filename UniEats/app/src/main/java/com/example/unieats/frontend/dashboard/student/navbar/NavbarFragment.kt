@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
-import com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudent
+import com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudentFragment
 import com.example.unieats.frontend.dashboard.student.OnNavItemSelectedListener
+import com.example.unieats.frontend.dashboard.student.Orders.OrdersFragment
 
-class Navbar: Fragment() {
+class NavbarFragment: Fragment() {
     private var listener: OnNavItemSelectedListener? = null
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -29,7 +30,7 @@ class Navbar: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.findViewById<ImageView>(R.id.home_button).setOnClickListener {
-            listener?.onNavItemSelected(HomePageStudent())
+            listener?.onNavItemSelected(HomePageStudentFragment())
         }
 
         view.findViewById<ImageView>(R.id.orders_button).setOnClickListener {
@@ -37,9 +38,9 @@ class Navbar: Fragment() {
         }
 
 
-        view.findViewById<ImageView>(R.id.profile_button).setOnClickListener {
-            listener?.onNavItemSelected(ProfileFragment())
-        }
+//        view.findViewById<ImageView>(R.id.profile_button).setOnClickListener {
+//            listener?.onNavItemSelected(ProfileFragment())
+//        }
     }
 
 }

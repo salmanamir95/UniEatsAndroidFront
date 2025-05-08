@@ -1,4 +1,6 @@
 package com.example.unieats.frontend.dashboard.student.Payment
 
-class PaymentFragment {
+import androidx.fragment.app.Fragment
+
+class PaymentFragment: Fragment() {
 }

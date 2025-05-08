@@ -74,4 +74,7 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.runtime.android)
+
+    implementation(libs.firebase.storage)
+
 }
