@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.unieats.R
+import com.example.unieats.frontend.dashboard.AppUser
+import com.example.unieats.frontend.dashboard.student.navbar.Navbar
 
 class StudentFragment: Fragment() {
     override fun onCreateView(
@@ -12,6 +15,21 @@ class StudentFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return inflater.inflate(R.layout.fragment_student_dashboard, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val user = savedInstanceState?.getSerializable("users") as? AppUser.Student
+        loadChildFragment(Navbar(), R.id.fragment_student_nav_bar)
+
+    }
+
+    private fun loadChildFragment(fragment: Fragment, containerId: Int) {
+        childFragmentManager.beginTransaction()
+            .replace(containerId, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+
 }
