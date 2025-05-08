@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
 import com.example.unieats.backend.repository.UserRepository
+import com.example.unieats.frontend.dashboard.AppUser
+import com.example.unieats.frontend.dashboard.UserNavigator
 import com.example.unieats.frontend.register.RegisterFragment
 
 class loginFragment: Fragment() {
@@ -63,7 +65,8 @@ class loginFragment: Fragment() {
                     onSuccess = { user ->
                         Toast.makeText(context, "Welcome ${user.name}", Toast.LENGTH_LONG).show()
                         // Add navigation logic here
-
+                        val foundData = AppUser.from(user)
+                        UserNavigator.navigateToDashboard(foundData,parentFragmentManager)
                     },
                     onFailure = { errorMsg ->
                         Toast.makeText(context, "Login failed: $errorMsg", Toast.LENGTH_LONG).show()
