@@ -5,12 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.unieats.R
 import com.example.unieats.frontend.dashboard.AppUser
 import com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudentFragment
+import com.example.unieats.frontend.dashboard.student.ListenerInterfaces.OnNavItemSelectedListener
 import com.example.unieats.frontend.dashboard.student.navbar.NavbarFragment
+import com.example.unieats.frontend.dashboard.student.SharedViewModels.SharedStudentViewModel
+import com.example.unieats.frontend.dashboard.student.SharedViewModels.MenuItemSharedViewModel
+import com.example.unieats.frontend.dashboard.student.Menu.MenuViewModel
+
+
 
 class StudentFragment: Fragment(), OnNavItemSelectedListener {
+    private val menuItemShared: MenuItemSharedViewModel by viewModels()
+    private val sharedStudentViewModel: SharedStudentViewModel by viewModels()
+    private val menuViewModel: MenuViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

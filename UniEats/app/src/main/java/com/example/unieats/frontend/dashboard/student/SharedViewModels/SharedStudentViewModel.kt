@@ -1,4 +1,4 @@
-package com.example.unieats.frontend.dashboard.student
+package com.example.unieats.frontend.dashboard.student.SharedViewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

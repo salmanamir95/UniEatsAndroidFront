@@ -9,7 +9,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.unieats.R
 import com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudentFragment
-import com.example.unieats.frontend.dashboard.student.OnNavItemSelectedListener
+import com.example.unieats.frontend.dashboard.student.ListenerInterfaces.OnNavItemSelectedListener
 import com.example.unieats.frontend.dashboard.student.Orders.OrdersFragment
 
 class NavbarFragment: Fragment() {

@@ -5,14 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.unieats.R
+import com.example.unieats.frontend.dashboard.student.MenuItem.MenuItemPageFragment
+import com.example.unieats.frontend.dashboard.student.SharedViewModels.MenuItemSharedViewModel
+import com.example.unieats.frontend.dashboard.student.SharedViewModels.SharedStudentViewModel
 
-class MenuFragment: Fragment() {
-    private val viewModel: MenuViewModel by viewModels()
+class MenuFragment : Fragment() {
+
+    private val viewModel: MenuViewModel by viewModels({ requireParentFragment() })
+    private val menuItemShared: MenuItemSharedViewModel by viewModels({ requireParentFragment() })
+    private val _student : SharedStudentViewModel by viewModels({ requireParentFragment() })
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter
 
@@ -29,13 +36,19 @@ class MenuFragment: Fragment() {
         recyclerView = view.findViewById(R.id.rvMenuItems)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = MenuAdapter(emptyList())
+        adapter = MenuAdapter(emptyList()) { clickedItem ->
+            menuItemShared.menuItem.value = clickedItem
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, MenuItemPageFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
         recyclerView.adapter = adapter
 
-        viewModel.menuItems.observe(viewLifecycleOwner, Observer { items ->
-            adapter = MenuAdapter(items)
-            recyclerView.adapter = adapter
-        })
+        viewModel.menuItems.observe(viewLifecycleOwner) { items ->
+            adapter.submitList(items)
+        }
 
         viewModel.fetchMenuItems()
     }
