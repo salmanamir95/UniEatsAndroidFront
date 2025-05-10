@@ -58,7 +58,7 @@ class MenuRepository {
                 val menuItem = child.getValue(MenuItem::class.java)
                 menuItem?.let {
                     // Convert each MenuItem to MenuItemModel with image (Bitmap)
-                    MenuItemModel.toMenuItemModel(it) { menuItemModel ->
+                    MenuItemModel.fromMenuItem(it) { menuItemModel ->
                         menuItems.add(menuItemModel)
                     }
                 }
