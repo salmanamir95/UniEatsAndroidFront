@@ -6,5 +6,5 @@ class MenuItemReviewModel (
     val userName : String,
     val rating : Float,
     val comment: String ,
-    val timestamp : DateTime
+    val timestamp : Long
 )

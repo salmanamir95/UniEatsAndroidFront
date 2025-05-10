@@ -1,5 +1,7 @@
 package com.example.unieats.backend.dbData
 
+import com.example.unieats.frontend.dashboard.student.MenuItem.MenuItemReviewModel
+
 data class MenuItemReview(
     val reviewId: String = "",
     val menuItemId: String = "",
