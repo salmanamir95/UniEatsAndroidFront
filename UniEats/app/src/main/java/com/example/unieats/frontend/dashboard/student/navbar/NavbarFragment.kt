@@ -28,7 +28,7 @@ class NavbarFragment : Fragment() {
         }
 
         view.findViewById<ImageView>(R.id.orders_button).setOnClickListener {
-            navController?.navigate(R.id.menuFragment)
+            navController?.navigate(R.id.ordersFragment)
         }
     }
 }
