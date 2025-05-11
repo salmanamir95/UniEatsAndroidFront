@@ -2,14 +2,16 @@ package com.example.unieats.frontend.dashboard.student.Menu
 
 import android.graphics.Bitmap
 import com.example.unieats.backend.dbData.MenuItem
+import com.example.unieats.backend.dbData.OrderItem
 
 class MenuItemModel(
     val id: Int = 0,
     val name: String = "",
     val category: String = "",
     val price: Double = 0.0,
-    val quantity: Int = 0,
-    val imageBitmap: Bitmap?
+    var quantity: Int = 0,
+    val imageBitmap: Bitmap?,
+    var isSelected: Boolean = false // <- New field
 ) {
     companion object {
         fun fromMenuItem(item: MenuItem, callback: (MenuItemModel) -> Unit) {
@@ -24,6 +26,15 @@ class MenuItemModel(
                 )
                 callback(model)
             }
+        }
+        fun toOrderItem(menuItemModel: MenuItemModel): OrderItem {
+            return OrderItem(
+                itemId = menuItemModel.id.toString(),
+                name = menuItemModel.name,
+                quantity = menuItemModel.quantity,
+                price = menuItemModel.price,
+                totalPrice = menuItemModel.price * menuItemModel.quantity
+            )
         }
     }
 }

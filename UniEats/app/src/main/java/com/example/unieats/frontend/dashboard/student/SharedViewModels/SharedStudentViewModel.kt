@@ -11,4 +11,9 @@ class SharedStudentViewModel: ViewModel() {
     fun setStudent(student: AppUser.Student) {
         user.value = student
     }
+
+    // Get current student
+    fun getStudent(): AppUser.Student? {
+        return user.value
+    }
 }

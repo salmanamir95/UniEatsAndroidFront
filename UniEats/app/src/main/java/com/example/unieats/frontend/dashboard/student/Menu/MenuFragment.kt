@@ -4,21 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.unieats.R
+import com.example.unieats.frontend.dashboard.student.ListenerInterfaces.OnMenuItemSelectedListener
 import com.example.unieats.frontend.dashboard.student.MenuItem.MenuItemPageFragment
 import com.example.unieats.frontend.dashboard.student.SharedViewModels.MenuItemSharedViewModel
+import com.example.unieats.frontend.dashboard.student.SharedViewModels.SelectedMenuItemsSharedtoCart
 import com.example.unieats.frontend.dashboard.student.SharedViewModels.SharedStudentViewModel
 
-class MenuFragment : Fragment() {
+class MenuFragment : Fragment(), OnMenuItemSelectedListener {
 
     private val viewModel: MenuViewModel by viewModels({ requireParentFragment() })
     private val menuItemShared: MenuItemSharedViewModel by viewModels({ requireParentFragment() })
     private val _student : SharedStudentViewModel by viewModels({ requireParentFragment() })
+    private val selectedMenuItemsViewModel: SelectedMenuItemsSharedtoCart by viewModels({requireParentFragment()})
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter
@@ -36,13 +40,8 @@ class MenuFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rvMenuItems)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = MenuAdapter(emptyList()) { clickedItem ->
-            menuItemShared.menuItem.value = clickedItem
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MenuItemPageFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+
+
 
         recyclerView.adapter = adapter
 
@@ -51,5 +50,44 @@ class MenuFragment : Fragment() {
         }
 
         viewModel.fetchMenuItems()
+
+        val btnAddToCart: Button = view.findViewById(R.id.btn_add_to_cart)
+        val btnOrderNow: Button = view.findViewById(R.id.btn_order_now)
+
+        adapter = MenuAdapter(emptyList(),
+            onItemClick = { clickedItem ->
+                menuItemShared.menuItem.value = clickedItem
+                moveToMenuItemPage(MenuItemPageFragment())
+            },
+            onItemSelectionChanged = { changedItem ->
+                viewModel.updateSelection(changedItem)
+                if (changedItem.isSelected)
+                    selectedMenuItemsViewModel.insert(changedItem)
+                else
+                    selectedMenuItemsViewModel.remove(changedItem)
+            },
+            selectedMenuItemsViewModel
+        )
+
+        recyclerView.adapter = adapter
+
+        btnAddToCart.setOnClickListener {
+            viewModel.selectedItems.value?.let { selected ->
+                // handle add to cart logic
+            }
+        }
+
+        btnOrderNow.setOnClickListener {
+            viewModel.selectedItems.value?.let { selected ->
+                // handle order now logic
+            }
+        }
+    }
+
+    override fun moveToMenuItemPage(itemPage: Fragment) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_student_content_container, itemPage)
+            .addToBackStack(null)
+            .commit()
     }
 }

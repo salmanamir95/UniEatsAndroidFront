@@ -19,7 +19,7 @@ class ReviewAdapter(private var reviews: List<MenuItemReviewModel>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_review, parent, false)
+            .inflate(R.layout.fragment_item_review, parent, false)
         return ReviewViewHolder(view)
     }
 

@@ -43,9 +43,9 @@ class MenuItemPageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Bind views
-        reviewRecyclerView = view.findViewById(R.id.rvReviews)
+        reviewRecyclerView = view.findViewById(R.id.recyclerReviews)
         ratingBar = view.findViewById(R.id.ratingBar)
-        commentEditText = view.findViewById(R.id.etComment)
+        commentEditText = view.findViewById(R.id.etReviewComment)
         submitButton = view.findViewById(R.id.btnSubmitReview)
 
         reviewAdapter = ReviewAdapter(emptyList())
@@ -54,7 +54,7 @@ class MenuItemPageFragment : Fragment() {
 
         menuItemShared.menuItem.observe(viewLifecycleOwner) { item ->
             menuItemRecvd.setMenuItem(item)
-            reviewViewModel.loadReviews(item.id) // Load reviews
+            reviewViewModel.loadReviews(item.id.toString()) // Load reviews
         }
 
         menuItemRecvd.recvd.observe(viewLifecycleOwner) { item ->

@@ -94,7 +94,7 @@
             android:minLines="2"
             android:maxLines="5"
             android:gravity="top|start"
-            android:background="@drawable/edittext_background"/>
+            />
 
         <Button
             android:id="@+id/btnSubmitReview"
@@ -102,7 +102,7 @@
             android:layout_height="wrap_content"
             android:text="Submit Review"
             android:layout_marginTop="12dp"
-            android:backgroundTint="@color/primary"/>
+            />
 
     </LinearLayout>
 </ScrollView>

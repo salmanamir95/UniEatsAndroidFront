@@ -107,7 +107,7 @@
             android:id="@+id/home_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_home"
+            android:src="@drawable/ic_profile"
             android:contentDescription="Home"
             android:layout_marginEnd="16dp" />
 
@@ -115,7 +115,7 @@
             android:id="@+id/users_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_users"
+            android:src="@drawable/ic_profile"
             android:contentDescription="Users"
             android:layout_marginEnd="16dp" />
 
@@ -123,15 +123,15 @@
             android:id="@+id/orders_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_orders"
+            android:src="@drawable/ic_profile"
             android:contentDescription="Orders"
             android:layout_marginEnd="16dp" />
 
         <ImageView
-            android:id="@+id/analytics_button"
+            android:id="@+id/analytics_button111"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_analytics"
+            android:src="@drawable/ic_profile"
             android:contentDescription="Analytics" />
     </LinearLayout>
 
