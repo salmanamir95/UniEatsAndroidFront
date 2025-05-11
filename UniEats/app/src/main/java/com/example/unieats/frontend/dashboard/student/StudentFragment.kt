@@ -21,6 +21,7 @@ class StudentFragment: Fragment(), OnNavItemSelectedListener {
     private val menuItemShared: MenuItemSharedViewModel by viewModels()
     private val sharedStudentViewModel: SharedStudentViewModel by viewModels()
     private val menuViewModel: MenuViewModel by viewModels()
+    private val currentStudent: SharedStudentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +33,7 @@ class StudentFragment: Fragment(), OnNavItemSelectedListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val user = savedInstanceState?.getSerializable("users") as? AppUser.Student
+        currentStudent.user.value= user
         loadChildFragment(NavbarFragment(), R.id.fragment_student_navbar_container)
         loadChildFragment(HomePageStudentFragment(), R.id.fragment_student_content_container)
     }
