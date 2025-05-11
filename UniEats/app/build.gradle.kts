@@ -80,6 +80,10 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation("androidx.fragment:fragment-ktx:1.6.2") // or latest stable
-
-
+    // build.gradle (app)
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
+    // app/build.gradle
+    implementation ("com.google.firebase:firebase-appcheck:17.1.2")
+    implementation(libs.firebase.appcheck.debug)
 }

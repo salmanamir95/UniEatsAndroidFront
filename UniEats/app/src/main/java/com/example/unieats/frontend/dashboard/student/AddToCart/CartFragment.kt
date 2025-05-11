@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,10 +16,12 @@ import com.example.unieats.frontend.dashboard.student.Menu.MenuAdapter
 import com.example.unieats.frontend.dashboard.student.SharedViewModels.SelectedMenuItemsSharedtoCart
 
 class CartFragment: Fragment() {
-    private val selectedItemsViewModel: SelectedMenuItemsSharedtoCart by viewModels({ requireParentFragment() })
-
+    private val selectedItemsViewModel: SelectedMenuItemsSharedtoCart by viewModels(
+        ownerProducer = { requireParentFragment() }
+    )
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter // reuse MenuAdapter for now
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

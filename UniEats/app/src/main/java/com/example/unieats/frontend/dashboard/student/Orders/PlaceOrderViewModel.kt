@@ -51,4 +51,12 @@ class PlaceOrderViewModel : ViewModel() {
             }
         }
     }
+
+    // Set full list of items to the order (replaces previous ones)
+    fun setOrderItems(items: List<OrderItem>) {
+        val total = items.sumOf { it.totalPrice }
+        _order.value = Order(items = items, totalAmount = total)
+        _totalBill.value = total
+    }
+
 }

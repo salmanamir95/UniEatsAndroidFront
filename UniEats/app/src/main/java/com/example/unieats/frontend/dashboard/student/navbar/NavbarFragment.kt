@@ -7,40 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.example.unieats.R
 import com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudentFragment
-import com.example.unieats.frontend.dashboard.student.ListenerInterfaces.OnNavItemSelectedListener
+import com.example.unieats.frontend.dashboard.student.Menu.MenuFragment
 import com.example.unieats.frontend.dashboard.student.Orders.OrdersFragment
+import com.example.unieats.frontend.dashboard.student.StudentFragment
 
-class NavbarFragment: Fragment() {
-    private var listener: OnNavItemSelectedListener? = null
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (parentFragment is OnNavItemSelectedListener) {
-            listener = parentFragment as OnNavItemSelectedListener
-        }
-    }
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_student_nav_bar, container,false)
-    }
+class NavbarFragment : Fragment() {
+    private var navController: NavController? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val studentFragment = parentFragment as? StudentFragment
+        navController = studentFragment?.navController
+
         view.findViewById<ImageView>(R.id.home_button).setOnClickListener {
-            listener?.onNavItemSelected(HomePageStudentFragment())
+            navController?.navigate(R.id.homePageStudentFragment)
         }
 
         view.findViewById<ImageView>(R.id.orders_button).setOnClickListener {
-            listener?.onNavItemSelected(OrdersFragment())
+            navController?.navigate(R.id.menuFragment)
         }
-
-
-//        view.findViewById<ImageView>(R.id.profile_button).setOnClickListener {
-//            listener?.onNavItemSelected(ProfileFragment())
-//        }
     }
-
 }

@@ -1,48 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_marginTop="8dp">
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="12dp">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+    <ImageView
+        android:id="@+id/home_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_profile"
+        android:contentDescription="Home" />
 
-            <!-- Food Catalogue Button -->
-            <Button
-                android:id="@+id/food_catalogue_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Explore Food Catalogue"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="12dp" />
+    <ImageView
+        android:id="@+id/orders_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_profile"
+        android:contentDescription="Orders" />
 
-            <!-- My Orders Button -->
-            <Button
-                android:id="@+id/my_orders_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="My Orders"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:layout_marginTop="16dp" />
-
-            <!-- Reservations Button -->
-            <Button
-                android:id="@+id/reservations_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Make Reservation"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="12dp"
-                android:layout_marginTop="16dp" />
-        </LinearLayout>
-    </ScrollView>
-
+    <ImageView
+        android:id="@+id/profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_profile"
+        android:contentDescription="Profile" />
 </LinearLayout>

@@ -1,0 +1,31 @@
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/student_nav_graph"
+    app:startDestination="@id/homePageStudentFragment">
+
+    <fragment
+        android:id="@+id/homePageStudentFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.HomePageStudent.HomePageStudentFragment"
+        android:label="Home"/>
+
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.Menu.MenuFragment"
+        android:label="Menu"/>
+
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.AddToCart.CartFragment"
+        android:label="Cart"/>
+
+    <fragment
+        android:id="@+id/ordersFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.Orders.OrdersFragment"
+        android:label="Orders"/>
+
+    <fragment
+        android:id="@+id/menuItemPageFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.MenuItem.MenuItemPageFragment"
+        android:label="Item Details"/>
+</navigation>
