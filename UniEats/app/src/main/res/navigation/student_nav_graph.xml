@@ -28,4 +28,9 @@
         android:id="@+id/menuItemPageFragment"
         android:name="com.example.unieats.frontend.dashboard.student.MenuItem.MenuItemPageFragment"
         android:label="Item Details"/>
+
+    <fragment
+        android:id="@+id/tableReservationFragment"
+        android:name="com.example.unieats.frontend.dashboard.student.Reservation.TableFragment"
+        android:label="Reservation"/>
 </navigation>
