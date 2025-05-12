@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.unieats.R
+import com.example.unieats.databinding.FragmentAdminBinding
 
 class AdminFragment : Fragment() {
 
@@ -27,7 +28,7 @@ class AdminFragment : Fragment() {
     private fun setupViewPager() {
         navigationAdapter = AdminNavigationAdapter(this)
         binding.viewPager.adapter = navigationAdapter
-        binding.viewPager.isUserInputEnabled = false // Disable swipe
+        binding.viewPager.isUserInputEnabled = false
 
         binding.bottomNav.setOnItemSelectedListener {
             when (it.itemId) {

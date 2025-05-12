@@ -49,9 +49,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+
 }
 
 
@@ -86,4 +93,6 @@ dependencies {
     // app/build.gradle
     implementation ("com.google.firebase:firebase-appcheck:17.1.2")
     implementation(libs.firebase.appcheck.debug)
+    implementation(libs.androidx.monitor)
+
 }
