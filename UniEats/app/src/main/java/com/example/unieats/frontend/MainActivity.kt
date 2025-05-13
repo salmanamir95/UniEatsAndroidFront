@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.unieats.R
+import com.example.unieats.backend.CloudinaryManager.CloudinaryManager
 import com.example.unieats.frontend.login.loginFragment
 import com.google.firebase.FirebaseApp
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
 
         setContentView(R.layout.activity_main)
-
+        CloudinaryManager.init(applicationContext)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

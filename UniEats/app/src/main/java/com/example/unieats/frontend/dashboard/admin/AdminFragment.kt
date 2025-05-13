@@ -1,5 +1,6 @@
 package com.example.unieats.frontend.dashboard.admin
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,13 +19,24 @@ class AdminFragment : Fragment() {
     private lateinit var shareMenu: MenuSharedViewModel
     private lateinit var navigationAdapter: AdminNavigationAdapter
 
+    private val REQUEST_CAMERA = 101
+    private val REQUEST_GALLERY = 102
+    private val REQUEST_PERMISSIONS = 103
+    private lateinit var currentPhotoUri: Uri
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAdminBinding.inflate(inflater, container, false)
-        shareMenu.data.value = ViewModelProvider(this)[AdminViewModel::class.java].menuRepository
+
+        shareMenu = ViewModelProvider(requireActivity())[MenuSharedViewModel::class.java]
+
+        val adminViewModel = ViewModelProvider(this)[AdminViewModel::class.java]
+        shareMenu.data.value = adminViewModel.menuRepository
+
         setupViewPager()
         return binding.root
     }

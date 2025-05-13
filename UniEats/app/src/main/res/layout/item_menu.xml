@@ -16,5 +16,24 @@
         app:layout_constraintTop_toTopOf="parent"
         android:padding="16dp" />
 
+    <TextView
+        android:id="@+id/menuItemPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Menu Item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="16dp" />
+
+    <ImageView
+        android:id="@+id/menuItemImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Menu item image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <!-- Add other views like Price, Image, etc. -->
 </androidx.constraintlayout.widget.ConstraintLayout>

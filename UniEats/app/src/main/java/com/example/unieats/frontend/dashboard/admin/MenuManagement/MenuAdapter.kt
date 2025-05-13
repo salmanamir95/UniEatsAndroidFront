@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.unieats.databinding.ItemMenuBinding
 import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
 
@@ -21,9 +22,13 @@ class MenuAdapter : ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuD
     }
 
     inner class MenuViewHolder(private val binding: ItemMenuBinding) : RecyclerView.ViewHolder(binding.root) {
+        // In MenuAdapter's MenuViewHolder
         fun bind(menuItem: MenuItemModel) {
             binding.menuItemName.text = menuItem.name
-            // Set other views like price, image, etc.
+            binding.menuItemPrice.text = "$${menuItem.price}"
+            Glide.with(binding.root.context)
+                .load(menuItem.imageBitmap)
+                .into(binding.menuItemImage)
         }
     }
 

@@ -8,6 +8,7 @@ import com.example.unieats.backend.repository.TableRepository
 import com.example.unieats.backend.repository.UserRepository
 
 class AdminViewModel : ViewModel() {
+
     val menuRepository = MenuRepository()
     val orderRepository = OrderRepository()
     val reviewRepository = ReviewRepository()

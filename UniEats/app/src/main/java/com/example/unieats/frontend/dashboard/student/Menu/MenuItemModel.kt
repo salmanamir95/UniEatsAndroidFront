@@ -36,5 +36,6 @@ data class MenuItemModel(
                 totalPrice = menuItemModel.price * menuItemModel.quantity
             )
         }
+
     }
 }

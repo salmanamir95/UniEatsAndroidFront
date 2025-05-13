@@ -94,5 +94,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-appcheck:17.1.2")
     implementation(libs.firebase.appcheck.debug)
     implementation(libs.androidx.monitor)
+    implementation(libs.androidx.material3.android)
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.cloudinary:cloudinary-android:2.3.1")
+
 
 }

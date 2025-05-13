@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.unieats.backend.dbData.MenuItem
+import com.example.unieats.frontend.dashboard.admin.MenuManagement.MenuItemAdmin
 import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -21,33 +22,31 @@ class MenuRepository {
     val menuItemsLiveData: LiveData<List<MenuItemModel>> get() = _menuItemsLiveData
 
     // CREATE: Add a new menu item with an image
+    // In MenuRepository
     fun addMenuItem(menuItem: MenuItem, imageUri: Uri, callback: (Boolean) -> Unit) {
-        val menuItemId = menuRef.push().key // Generate a unique ID for the menu item
+        val menuItemId = menuRef.push().key
 
         menuItemId?.let {
-            // Upload the image to Firebase Storage
             val imageRef = storageRef.child("$menuItemId.jpg")
             imageRef.putFile(imageUri).addOnCompleteListener { uploadTask ->
                 if (uploadTask.isSuccessful) {
-                    // Get the image URL after the upload is successful
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
-                        // Update the menu item with the image URL
-                        val menuItemWithImage = menuItem.copy(imageUrl = uri.toString())
-
-                        // Save menu item metadata to Firebase Realtime Database
-                        menuRef.child(menuItemId).setValue(menuItemWithImage).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                callback(true)  // Successfully added
-                            } else {
-                                callback(false)  // Failed to add
+                        val updatedMenuItem = menuItem.copy(
+                            id = menuItemId.toInt(),
+                            imageUrl = uri.toString()
+                        )
+                        menuRef.child(menuItemId).setValue(updatedMenuItem)
+                            .addOnCompleteListener { task ->
+                                callback(task.isSuccessful)
                             }
-                        }
+                    }.addOnFailureListener {
+                        callback(false)
                     }
                 } else {
-                    callback(false)  // Image upload failed
+                    callback(false)
                 }
             }
-        } ?: callback(false)  // Failed to generate unique ID
+        } ?: callback(false)
     }
 
     // READ: Fetch the list of all menu items (convert to MenuItemModel with image)
