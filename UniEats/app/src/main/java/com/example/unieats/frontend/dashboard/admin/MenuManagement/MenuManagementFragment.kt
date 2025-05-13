@@ -77,11 +77,8 @@ class MenuManagementFragment : Fragment() {
 
         menuAdapter = MenuAdapter { menuItem ->
             // On item click, navigate to MenuItemDetailFragment
-            val fragment = AdminMenuItemDetailFragment.newInstance(menuItem)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit()
+            val dialog = AdminMenuItemDetailFragment.newInstance(menuItem)
+            dialog.show(parentFragmentManager, "AdminMenuItemDetailDialog")
         }
 
         binding.rvMenuItems.apply {
