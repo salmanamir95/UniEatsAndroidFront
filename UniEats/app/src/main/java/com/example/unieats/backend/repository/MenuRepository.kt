@@ -118,6 +118,23 @@ class MenuRepository(private val context: Context) {
                 _menuItemsLiveData.postValue(emptyList())
             }
         })
+
+
+
+    }
+
+    fun getMenuItemById(menuItemId: String, callback: (MenuItemModel?) -> Unit) {
+        menuRef.child(menuItemId).get().addOnSuccessListener { dataSnapshot ->
+            val menuItem = dataSnapshot.getValue(MenuItem::class.java)
+            menuItem?.let {
+                MenuItemModel.fromMenuItem(it) { model ->
+                    callback(model)
+                }
+            } ?: callback(null)
+        }.addOnFailureListener { exception ->
+            Log.e("MenuRepository", "Error fetching item by ID: ${exception.message}")
+            callback(null)
+        }
     }
 
 
@@ -136,4 +153,55 @@ class MenuRepository(private val context: Context) {
                 callback(task.isSuccessful)
             }
     }
+
+    fun updateMenuItem(model: MenuItemModel, callback: (Boolean) -> Unit) {
+        val menuItemId = model.id
+
+        if (menuItemId.isBlank()) {
+            Log.e("MenuRepository", "Update failed: ID is blank")
+            callback(false)
+            return
+        }
+
+        // Convert Bitmap to Base64
+        val base64Image = model.imageBitmap?.let { bitmap ->
+            try {
+                val outputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                val byteArray = outputStream.toByteArray()
+                Base64.encodeToString(byteArray, Base64.DEFAULT)
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Bitmap to Base64 conversion failed: ${e.message}")
+                null
+            }
+        }
+
+        if (base64Image == null) {
+            Log.e("MenuRepository", "Update failed: image conversion failed")
+            callback(false)
+            return
+        }
+
+        val updatedItem = MenuItem(
+            id = model.id,
+            name = model.name,
+            price = model.price,
+            category = model.category,
+            quantity = model.quantity,
+            imageUrl = base64Image
+        )
+
+        menuRef.child(menuItemId).setValue(updatedItem)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("MenuRepository", "Item updated successfully")
+                } else {
+                    Log.e("MenuRepository", "Update failed: ${task.exception?.message}")
+                }
+                callback(task.isSuccessful)
+            }
+    }
+
+
+
 }

@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.unieats.R
-import com.example.unieats.backend.CloudinaryManager.CloudinaryManager
 import com.example.unieats.frontend.login.loginFragment
 import com.google.firebase.FirebaseApp
 
@@ -22,9 +21,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set content view to activity_main layout
         setContentView(R.layout.activity_main)
-
-        // Initialize Cloudinary manager
-        CloudinaryManager.init(applicationContext)
 
         // Apply insets to adjust for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

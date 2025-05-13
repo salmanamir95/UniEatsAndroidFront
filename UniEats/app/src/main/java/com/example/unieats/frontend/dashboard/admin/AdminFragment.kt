@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.unieats.R
 import com.example.unieats.backend.repository.MenuRepository
 import com.example.unieats.databinding.FragmentAdminBinding
-import com.example.unieats.frontend.SharedViewModelTemplate.SharedViewModel
 import com.example.unieats.frontend.dashboard.admin.SharedViewModels.MenuSharedViewModel
 
 class AdminFragment : Fragment() {

@@ -51,9 +51,7 @@ class MenuManageViewModel : ViewModel() {
         }
     }
 
-    fun updateMenuItem(itemId: String, updatedItem: MenuItem, callback: (Boolean) -> Unit) {
-        repository.updateMenuItem(itemId, updatedItem, callback)
-    }
+
 
     fun deleteMenuItem(itemId: String, callback: (Boolean) -> Unit) {
         repository.deleteMenuItem(itemId, callback)
