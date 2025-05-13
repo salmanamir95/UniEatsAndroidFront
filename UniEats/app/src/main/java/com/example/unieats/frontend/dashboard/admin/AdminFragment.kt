@@ -7,20 +7,24 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.unieats.R
+import com.example.unieats.backend.repository.MenuRepository
 import com.example.unieats.databinding.FragmentAdminBinding
+import com.example.unieats.frontend.SharedViewModelTemplate.SharedViewModel
+import com.example.unieats.frontend.dashboard.admin.SharedViewModels.MenuSharedViewModel
 
 class AdminFragment : Fragment() {
 
     private lateinit var binding: FragmentAdminBinding
-    private lateinit var adminViewModel: AdminViewModel
+    private lateinit var shareMenu: MenuSharedViewModel
     private lateinit var navigationAdapter: AdminNavigationAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAdminBinding.inflate(inflater, container, false)
-        adminViewModel = ViewModelProvider(this)[AdminViewModel::class.java]
+        shareMenu.data.value = ViewModelProvider(this)[AdminViewModel::class.java].menuRepository
         setupViewPager()
         return binding.root
     }

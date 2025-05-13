@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.example.unieats.backend.dbData.MenuItem
 import com.example.unieats.backend.dbData.OrderItem
 
-class MenuItemModel(
+data class MenuItemModel(
     val id: Int = 0,
     val name: String = "",
     val category: String = "",

@@ -53,22 +53,36 @@ class MenuRepository {
     // READ: Fetch the list of all menu items (convert to MenuItemModel with image)
     fun getMenuItems() {
         menuRef.get().addOnSuccessListener { snapshot ->
-            val menuItems = mutableListOf<MenuItemModel>()
-            for (child in snapshot.children) {
+            val tempList = mutableListOf<MenuItemModel>()
+            val children = snapshot.children.toList()
+            if (children.isEmpty()) {
+                _menuItemsLiveData.postValue(emptyList())
+                return@addOnSuccessListener
+            }
+
+            var processedCount = 0
+            for (child in children) {
                 val menuItem = child.getValue(MenuItem::class.java)
                 menuItem?.let {
-                    // Convert each MenuItem to MenuItemModel with image (Bitmap)
-                    MenuItemModel.fromMenuItem(it) { menuItemModel ->
-                        menuItems.add(menuItemModel)
+                    MenuItemModel.fromMenuItem(it) { model ->
+                        tempList.add(model)
+                        processedCount++
+                        if (processedCount == children.size) {
+                            _menuItemsLiveData.postValue(tempList)
+                        }
+                    }
+                } ?: run {
+                    processedCount++
+                    if (processedCount == children.size) {
+                        _menuItemsLiveData.postValue(tempList)
                     }
                 }
             }
-            // Update LiveData with the list of MenuItemModel
-            _menuItemsLiveData.postValue(menuItems)  // Post the value to LiveData
         }.addOnFailureListener {
-            _menuItemsLiveData.postValue(emptyList())  // If failed to fetch data, post an empty list
+            _menuItemsLiveData.postValue(emptyList())
         }
     }
+
 
     // UPDATE: Update an existing menu item (without changing the image)
     fun updateMenuItem(menuItemId: String, updatedMenuItem: MenuItem, callback: (Boolean) -> Unit) {

@@ -6,15 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".frontend.dashboard.admin.MenuManagement.MenuManagementFragment">
 
+    <!-- Title TextView -->
     <TextView
         android:id="@+id/menuTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Menu Management"
-        android:textSize="24sp"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="16dp"
+        android:text="Menu Management Screen"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:padding="16dp" />
+
+    <!-- RecyclerView for Menu Items -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMenuItems"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/menuTitle"
+        app:layout_constraintBottom_toTopOf="@id/btnAddMenuItem" />
+
+    <!-- Button to Add Menu Item -->
+    <Button
+        android:id="@+id/btnAddMenuItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Menu Item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
