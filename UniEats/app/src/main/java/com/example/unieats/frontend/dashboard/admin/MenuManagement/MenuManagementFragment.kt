@@ -144,7 +144,6 @@ class MenuManagementFragment : Fragment() {
 
         btnGallery.setOnClickListener {
             galleryLauncher.launch("image/*")
-//            selectedImageUri?.let { loadImageAsync(it, imagePreview) }
         }
 
         AlertDialog.Builder(context)

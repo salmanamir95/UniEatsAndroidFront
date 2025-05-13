@@ -1,68 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:spacing="12dp">
 
+        <!-- Name Field -->
         <EditText
             android:id="@+id/etName"
-            android:hint="Name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:textSize="16sp" />
 
+        <!-- Category Field -->
         <EditText
             android:id="@+id/etCategory"
-            android:hint="Category"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="Category"
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:textSize="16sp" />
 
+        <!-- Price Field -->
         <EditText
             android:id="@+id/etPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="Price"
             android:inputType="numberDecimal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:textSize="16sp" />
 
+        <!-- Quantity Field -->
         <EditText
             android:id="@+id/etQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="Quantity"
             android:inputType="number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:textSize="16sp" />
 
+        <!-- Image Preview -->
         <ImageView
             android:id="@+id/imagePreview"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:layout_marginTop="16dp"
             android:scaleType="centerCrop"
-            android:layout_marginTop="12dp"
-            android:background="#DDD" />
+            android:background="@drawable/image_preview_background"
+            android:contentDescription="Preview" />
 
+        <!-- Camera & Gallery Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="16dp"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/btnCamera"
-                android:text="Camera"
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Camera"
+                android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/btnGallery"
-                android:text="Gallery"
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gallery"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

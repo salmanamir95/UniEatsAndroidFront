@@ -1,42 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".frontend.dashboard.admin.MenuManagement.MenuManagementFragment">
+    android:padding="16dp"
+    tools:context=".frontend.dashboard.admin.MenuManagement.MenuManagementFragment"
+    android:background="?android:colorBackground">
 
-    <!-- Title TextView -->
+    <!-- Screen Title -->
     <TextView
         android:id="@+id/menuTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Menu Management Screen"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="🍽️ Menu Management"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
 
-    <!-- RecyclerView for Menu Items -->
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMenuItems"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="vertical"
         app:layout_constraintTop_toBottomOf="@id/menuTitle"
-        app:layout_constraintBottom_toTopOf="@id/btnAddMenuItem" />
-
-    <!-- Button to Add Menu Item -->
-    <Button
-        android:id="@+id/btnAddMenuItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Menu Item"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnAddMenuItem"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Add Menu Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddMenuItem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="➕ Add Menu Item"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:cornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
