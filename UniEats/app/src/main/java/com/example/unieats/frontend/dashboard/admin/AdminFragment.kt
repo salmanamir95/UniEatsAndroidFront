@@ -33,9 +33,8 @@ class AdminFragment : Fragment() {
         binding = FragmentAdminBinding.inflate(inflater, container, false)
 
         shareMenu = ViewModelProvider(requireActivity())[MenuSharedViewModel::class.java]
-
-        val adminViewModel = ViewModelProvider(this)[AdminViewModel::class.java]
-        shareMenu.data.value = adminViewModel.menuRepository
+        val menuRepository = MenuRepository(requireContext())
+        shareMenu.data.value = menuRepository
 
         setupViewPager()
         return binding.root

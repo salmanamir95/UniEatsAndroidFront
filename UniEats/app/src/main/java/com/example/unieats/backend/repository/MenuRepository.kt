@@ -1,116 +1,139 @@
 package com.example.unieats.backend.repository
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.unieats.backend.dbData.MenuItem
-import com.example.unieats.frontend.dashboard.admin.MenuManagement.MenuItemAdmin
 import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
 
-class MenuRepository {
-
+class MenuRepository(private val context: Context) {
     private val database = FirebaseDatabase.getInstance()
-    private val menuRef = database.getReference("menu")  // Firebase Realtime Database reference for menu items
-    private val storage = FirebaseStorage.getInstance()
-    private val storageRef: StorageReference = storage.reference.child("menu_images") // Firebase Storage reference for images
-
-    // LiveData to hold the list of MenuItemModels
+    private val menuRef = database.getReference("menu")
     private val _menuItemsLiveData = MutableLiveData<List<MenuItemModel>>()
+    private val repositoryScope = CoroutineScope(Dispatchers.IO)
+
     val menuItemsLiveData: LiveData<List<MenuItemModel>> get() = _menuItemsLiveData
 
-    // CREATE: Add a new menu item with an image
-    // In MenuRepository
+    // CREATE: Add a new menu item with Base64 image
     fun addMenuItem(menuItem: MenuItem, imageUri: Uri, callback: (Boolean) -> Unit) {
-        val menuItemId = menuRef.push().key
-
-        menuItemId?.let {
-            val imageRef = storageRef.child("$menuItemId.jpg")
-            imageRef.putFile(imageUri).addOnCompleteListener { uploadTask ->
-                if (uploadTask.isSuccessful) {
-                    imageRef.downloadUrl.addOnSuccessListener { uri ->
-                        val updatedMenuItem = menuItem.copy(
-                            id = menuItemId.toInt(),
-                            imageUrl = uri.toString()
-                        )
-                        menuRef.child(menuItemId).setValue(updatedMenuItem)
-                            .addOnCompleteListener { task ->
-                                callback(task.isSuccessful)
-                            }
-                    }.addOnFailureListener {
-                        callback(false)
-                    }
-                } else {
+        repositoryScope.launch {
+            try {
+                val menuItemId = menuRef.push().key ?: run {
                     callback(false)
+                    return@launch
                 }
+
+                val base64Image = convertImageUriToBase64(imageUri)
+                if (base64Image == null) {
+                    Log.e("MenuRepository", "Image conversion failed")
+                    callback(false)
+                    return@launch
+                }
+
+                val updatedMenuItem = menuItem.copy(
+                    id = menuItemId,
+                    imageUrl = base64Image
+                )
+
+                // Firebase operation should be on main thread
+                menuRef.child(menuItemId).setValue(updatedMenuItem)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("MenuRepository", "Item added successfully")
+                        } else {
+                            Log.e("MenuRepository", "Firebase error: ${task.exception?.message}")
+                        }
+                        callback(task.isSuccessful)
+                    }
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Add menu item error: ${e.message}")
+                callback(false)
             }
-        } ?: callback(false)
+        }
     }
 
-    // READ: Fetch the list of all menu items (convert to MenuItemModel with image)
-    fun getMenuItems() {
-        menuRef.get().addOnSuccessListener { snapshot ->
-            val tempList = mutableListOf<MenuItemModel>()
-            val children = snapshot.children.toList()
-            if (children.isEmpty()) {
-                _menuItemsLiveData.postValue(emptyList())
-                return@addOnSuccessListener
-            }
+    // Convert URI to Base64 string with proper threading
+    private suspend fun convertImageUriToBase64(uri: Uri): String? = withContext(Dispatchers.IO) {
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                    ?: throw IOException("Failed to decode bitmap")
 
-            var processedCount = 0
-            for (child in children) {
-                val menuItem = child.getValue(MenuItem::class.java)
-                menuItem?.let {
-                    MenuItemModel.fromMenuItem(it) { model ->
-                        tempList.add(model)
-                        processedCount++
-                        if (processedCount == children.size) {
-                            _menuItemsLiveData.postValue(tempList)
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 600, 600, true)
+
+                val outputStream = ByteArrayOutputStream()
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
+            }
+        } catch (e: Exception) {
+            Log.e("MenuRepository", "Image conversion error: ${e.message}")
+            null
+        }
+    }
+
+
+    // READ
+    // REAL-TIME LISTENER: Live updates without refresh
+    fun observeMenuItems() {
+        menuRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                repositoryScope.launch {
+                    val tempList = mutableListOf<MenuItemModel>()
+                    val children = snapshot.children.toList()
+
+                    children.forEach { child ->
+                        val menuItem = child.getValue(MenuItem::class.java)
+                        menuItem?.let {
+                            MenuItemModel.fromMenuItem(it) { model ->
+                                tempList.add(model)
+                                if (tempList.size == children.size) {
+                                    _menuItemsLiveData.postValue(tempList)
+                                }
+                            }
                         }
                     }
-                } ?: run {
-                    processedCount++
-                    if (processedCount == children.size) {
-                        _menuItemsLiveData.postValue(tempList)
+
+                    // Handle empty state
+                    if (children.isEmpty()) {
+                        _menuItemsLiveData.postValue(emptyList())
                     }
                 }
             }
-        }.addOnFailureListener {
-            _menuItemsLiveData.postValue(emptyList())
-        }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                Log.e("MenuRepository", "Real-time listener cancelled: ${error.message}")
+                _menuItemsLiveData.postValue(emptyList())
+            }
+        })
     }
 
 
-    // UPDATE: Update an existing menu item (without changing the image)
+    // UPDATE
     fun updateMenuItem(menuItemId: String, updatedMenuItem: MenuItem, callback: (Boolean) -> Unit) {
-        menuRef.child(menuItemId).setValue(updatedMenuItem).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                callback(true)  // Successfully updated
-            } else {
-                callback(false)  // Failed to update
+        menuRef.child(menuItemId).setValue(updatedMenuItem)
+            .addOnCompleteListener { task ->
+                callback(task.isSuccessful)
             }
-        }
     }
 
-    // DELETE: Remove a menu item (also remove the image from Firebase Storage)
+    // DELETE
     fun deleteMenuItem(menuItemId: String, callback: (Boolean) -> Unit) {
-        // First, delete the image from Firebase Storage
-        val imageRef = storageRef.child("$menuItemId.jpg")
-        imageRef.delete().addOnCompleteListener { imageDeleteTask ->
-            if (imageDeleteTask.isSuccessful) {
-                // Then, delete the menu item metadata from Firebase Realtime Database
-                menuRef.child(menuItemId).removeValue().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        callback(true)  // Successfully deleted
-                    } else {
-                        callback(false)  // Failed to delete menu item
-                    }
-                }
-            } else {
-                callback(false)  // Failed to delete image
+        menuRef.child(menuItemId).removeValue()
+            .addOnCompleteListener { task ->
+                callback(task.isSuccessful)
             }
-        }
     }
 }

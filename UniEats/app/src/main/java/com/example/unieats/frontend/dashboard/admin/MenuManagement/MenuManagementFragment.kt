@@ -5,15 +5,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -46,9 +40,8 @@ class MenuManagementFragment : Fragment() {
 
     private val REQUEST_PERMISSIONS = 103
     private lateinit var currentPhotoUri: Uri
-
     private var selectedImageUri: Uri? = null
-    private var imagePreview: ImageView? = null
+    lateinit var imagePreview : ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,16 +49,16 @@ class MenuManagementFragment : Fragment() {
         fullCameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && ::currentPhotoUri.isInitialized) {
                 selectedImageUri = currentPhotoUri
-                loadImageAsync(currentPhotoUri)
             }
         }
 
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 selectedImageUri = it
-                loadImageAsync(it)
+                loadImageAsync(it, imagePreview) // ← move this here
             }
         }
+
     }
 
     override fun onCreateView(
@@ -74,12 +67,17 @@ class MenuManagementFragment : Fragment() {
     ): View {
         _binding = FragmentMenuManagementBinding.inflate(inflater, container, false)
 
+        // Inject repository from shared ViewModel
         val sharedRepo = ViewModelProvider(requireActivity())[MenuSharedViewModel::class.java].data.value
-        sharedRepo?.let { menuViewModel.init(it) }
+        sharedRepo?.let {
+            if (!menuViewModel.isInitialized()) menuViewModel.init(it)
+        }
 
         menuAdapter = MenuAdapter()
-        binding.rvMenuItems.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvMenuItems.adapter = menuAdapter
+        binding.rvMenuItems.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = menuAdapter
+        }
 
         menuViewModel.menuItems.observe(viewLifecycleOwner) { items ->
             menuAdapter.submitList(items)
@@ -87,11 +85,7 @@ class MenuManagementFragment : Fragment() {
 
         binding.btnAddMenuItem.setOnClickListener {
             if (checkAndRequestPermissions()) {
-                if (menuViewModel.isInitialized()) {
-                    showAddMenuItemDialog()
-                } else {
-                    Toast.makeText(requireContext(), "Repository not initialized yet", Toast.LENGTH_SHORT).show()
-                }
+                showAddMenuItemDialog()
             }
         }
 
@@ -104,17 +98,15 @@ class MenuManagementFragment : Fragment() {
     }
 
     private fun checkAndRequestPermissions(): Boolean {
-        val neededPermissions = mutableListOf<String>()
-
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.CAMERA)
-        }
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permissionsNeeded = listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ).filter {
+            ContextCompat.checkSelfPermission(requireContext(), it) != PackageManager.PERMISSION_GRANTED
         }
 
-        return if (neededPermissions.isNotEmpty()) {
-            requestPermissions(neededPermissions.toTypedArray(), REQUEST_PERMISSIONS)
+        return if (permissionsNeeded.isNotEmpty()) {
+            requestPermissions(permissionsNeeded.toTypedArray(), REQUEST_PERMISSIONS)
             false
         } else true
     }
@@ -126,6 +118,8 @@ class MenuManagementFragment : Fragment() {
     }
 
     private fun showAddMenuItemDialog() {
+        selectedImageUri = null  // Reset image state for each dialog
+
         val context = requireContext()
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_menu_item_admin, null)
 
@@ -133,8 +127,7 @@ class MenuManagementFragment : Fragment() {
         val etCategory = dialogView.findViewById<EditText>(R.id.etCategory)
         val etPrice = dialogView.findViewById<EditText>(R.id.etPrice)
         val etQuantity = dialogView.findViewById<EditText>(R.id.etQuantity)
-        imagePreview = dialogView.findViewById(R.id.imagePreview)
-
+         imagePreview = dialogView.findViewById<ImageView>(R.id.imagePreview)
         val btnCamera = dialogView.findViewById<Button>(R.id.btnCamera)
         val btnGallery = dialogView.findViewById<Button>(R.id.btnGallery)
 
@@ -146,32 +139,34 @@ class MenuManagementFragment : Fragment() {
                 imageFile
             )
             fullCameraLauncher.launch(currentPhotoUri)
+            loadImageAsync(currentPhotoUri, imagePreview)
         }
 
         btnGallery.setOnClickListener {
             galleryLauncher.launch("image/*")
+//            selectedImageUri?.let { loadImageAsync(it, imagePreview) }
         }
 
         AlertDialog.Builder(context)
             .setTitle("Add Menu Item")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
-                val name = etName.text.toString()
-                val category = etCategory.text.toString()
+                val name = etName.text.toString().trim()
+                val category = etCategory.text.toString().trim()
                 val price = etPrice.text.toString().toDoubleOrNull() ?: 0.0
                 val quantity = etQuantity.text.toString().toIntOrNull() ?: 0
+
+                if (name.isEmpty() || category.isEmpty()) {
+                    Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
 
                 if (selectedImageUri == null) {
                     Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
-                if (!menuViewModel.isInitialized()) {
-                    Toast.makeText(context, "Repository not initialized", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val itemAdmin = MenuItemAdmin().apply {
+                val newItem = MenuItemAdmin().apply {
                     this.name = name
                     this.category = category
                     this.price = price
@@ -179,27 +174,27 @@ class MenuManagementFragment : Fragment() {
                     this.imageUrl = selectedImageUri.toString()
                 }
 
-                menuViewModel.addMenuItem(itemAdmin, selectedImageUri!!) { success ->
-                    if (success) {
-                        Toast.makeText(context, "Item added successfully", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Failed to add item", Toast.LENGTH_SHORT).show()
-                    }
+                menuViewModel.addMenuItem(newItem, selectedImageUri!!) { success ->
+                    Toast.makeText(
+                        context,
+                        if (success) "Item added successfully" else "Failed to add item",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun loadImageAsync(uri: Uri) {
+    private fun loadImageAsync(uri: Uri, target: ImageView) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 Glide.with(requireContext())
                     .load(uri)
-                    .into(imagePreview ?: return@launch)
+                    .into(target)
             } catch (e: Exception) {
+                Log.e("ImageLoad", "Error loading image", e)
                 Toast.makeText(requireContext(), "Failed to load image", Toast.LENGTH_SHORT).show()
-                Log.e("ImageLoad", "Error: ${e.message}")
             }
         }
     }
@@ -213,15 +208,11 @@ class MenuManagementFragment : Fragment() {
 
         if (requestCode == REQUEST_PERMISSIONS) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                if (menuViewModel.isInitialized()) {
-                    showAddMenuItemDialog()
-                } else {
-                    Toast.makeText(requireContext(), "Repository not initialized", Toast.LENGTH_SHORT).show()
-                }
-
+                showAddMenuItemDialog()
             } else {
                 Toast.makeText(requireContext(), "Permissions denied.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 }
+

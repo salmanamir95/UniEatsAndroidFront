@@ -31,7 +31,7 @@ class MenuManageViewModel : ViewModel() {
 
     fun loadMenuItems() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getMenuItems()
+            repository.observeMenuItems()
         }
     }
 

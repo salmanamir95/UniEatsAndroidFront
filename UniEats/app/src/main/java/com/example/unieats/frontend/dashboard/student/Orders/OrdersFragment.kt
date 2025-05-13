@@ -74,9 +74,9 @@ class OrdersFragment : Fragment() {
         selectedItemsViewModel.studentSelection.observe(viewLifecycleOwner) { selectedItems ->
             if (!itemsInitialized) {
                 val orderItems = selectedItems.map {
-                    MenuItemModel.toOrderItem(it) // you must implement this
+//                    MenuItemModel.toOrderItem(it) // you must implement this
                 }
-                placeOrderViewModel.setOrderItems(orderItems)
+//                placeOrderViewModel.setOrderItems(orderItems)
                 itemsInitialized = true
             }
         }
