@@ -6,18 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.unieats.databinding.FragmentMenuManagementBinding
+import com.example.unieats.databinding.FragmentUserManagementBinding
 
 class UserManagementFragment: Fragment() {
-    private var _binding: FragmentMenuManagementBinding? = null
+    private var _binding: FragmentUserManagementBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentMenuManagementBinding.inflate(inflater, container, false)
+        _binding = FragmentUserManagementBinding.inflate(inflater, container, false)
 
-        binding.menuTitle.text = "User Management Screen"
+        binding.userTitle.text = "User Management Screen"
 
         return binding.root
     }

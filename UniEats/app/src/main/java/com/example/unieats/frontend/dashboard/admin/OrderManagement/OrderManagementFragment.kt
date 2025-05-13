@@ -6,18 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.unieats.databinding.FragmentMenuManagementBinding
+import com.example.unieats.databinding.FragmentOrderManagementBinding
 
 class OrderManagementFragment: Fragment() {
-    private var _binding: FragmentMenuManagementBinding? = null
+    private var _binding: FragmentOrderManagementBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentMenuManagementBinding.inflate(inflater, container, false)
+        _binding = FragmentOrderManagementBinding.inflate(inflater, container, false)
 
-        binding.menuTitle.text = "Order Management Screen"
+        binding.orderTitle.text = "Order Management Screen"
 
         return binding.root
     }

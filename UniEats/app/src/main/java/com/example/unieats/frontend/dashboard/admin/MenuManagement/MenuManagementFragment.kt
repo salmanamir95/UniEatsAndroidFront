@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.unieats.R
 import com.example.unieats.databinding.FragmentMenuManagementBinding
+import com.example.unieats.frontend.dashboard.admin.MenuItemDetailAdmin.AdminMenuItemDetailFragment
 import com.example.unieats.frontend.dashboard.admin.SharedViewModels.MenuSharedViewModel
 import kotlinx.coroutines.launch
 import java.io.File
@@ -73,7 +74,16 @@ class MenuManagementFragment : Fragment() {
             if (!menuViewModel.isInitialized()) menuViewModel.init(it)
         }
 
-        menuAdapter = MenuAdapter()
+
+        menuAdapter = MenuAdapter { menuItem ->
+            // On item click, navigate to MenuItemDetailFragment
+            val fragment = AdminMenuItemDetailFragment.newInstance(menuItem)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
         binding.rvMenuItems.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = menuAdapter

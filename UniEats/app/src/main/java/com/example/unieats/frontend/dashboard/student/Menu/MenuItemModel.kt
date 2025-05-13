@@ -1,8 +1,11 @@
 package com.example.unieats.frontend.dashboard.student.Menu
 
 import android.graphics.Bitmap
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import com.example.unieats.backend.dbData.MenuItem
 
+@Parcelize
 data class MenuItemModel(
     val id: String = "",
     val name: String = "",
@@ -10,8 +13,8 @@ data class MenuItemModel(
     val price: Double = 0.0,
     var quantity: Int = 0,
     val imageBitmap: Bitmap?,
-    var isSelected: Boolean = false // <- New field
-) {
+    var isSelected: Boolean = false
+) : Parcelable {
     companion object {
         fun fromMenuItem(item: MenuItem, callback: (MenuItemModel) -> Unit) {
             // Fetch image and quantity
@@ -21,7 +24,7 @@ data class MenuItemModel(
                     name = item.name,
                     category = item.category,
                     price = item.price,
-                    quantity = item.quantity, // Quantity should be fetched from the DB
+                    quantity = item.quantity,
                     imageBitmap = bitmap
                 )
                 callback(model)

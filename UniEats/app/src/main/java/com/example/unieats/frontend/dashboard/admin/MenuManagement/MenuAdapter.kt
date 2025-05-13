@@ -9,7 +9,8 @@ import com.bumptech.glide.Glide
 import com.example.unieats.databinding.ItemMenuBinding
 import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
 
-class MenuAdapter : ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuDiffCallback()) {
+class MenuAdapter(private val onItemClick: (MenuItemModel) -> Unit) :
+    ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
         val binding = ItemMenuBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,13 +23,17 @@ class MenuAdapter : ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuD
     }
 
     inner class MenuViewHolder(private val binding: ItemMenuBinding) : RecyclerView.ViewHolder(binding.root) {
-        // In MenuAdapter's MenuViewHolder
         fun bind(menuItem: MenuItemModel) {
             binding.menuItemName.text = menuItem.name
             binding.menuItemPrice.text = "$${menuItem.price}"
             Glide.with(binding.root.context)
                 .load(menuItem.imageBitmap)
                 .into(binding.menuItemImage)
+
+            // Detect the item click
+            binding.root.setOnClickListener {
+                onItemClick(menuItem)
+            }
         }
     }
 
@@ -38,14 +43,7 @@ class MenuAdapter : ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuD
         }
 
         override fun areContentsTheSame(oldItem: MenuItemModel, newItem: MenuItemModel): Boolean {
-            return oldItem.id == newItem.id &&
-                    oldItem.name == newItem.name &&
-                    oldItem.category == newItem.category &&
-                    oldItem.price == newItem.price &&
-                    oldItem.quantity == newItem.quantity &&
-                    oldItem.isSelected == newItem.isSelected
-            // Avoid comparing imageBitmap unless needed
+            return oldItem == newItem
         }
-
     }
 }

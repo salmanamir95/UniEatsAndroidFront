@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -56,6 +57,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
 
 
