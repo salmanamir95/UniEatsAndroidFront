@@ -18,7 +18,6 @@ class TableManagementFragment: Fragment() {
     ): View? {
         _binding = FragmentTableManagementBinding.inflate(inflater, container, false)
 
-        binding.tableTitle.text = "Table Management Screen"
 
         return binding.root
     }
@@ -27,4 +26,14 @@ class TableManagementFragment: Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun calculateSpanCount(): Int {
+        val screenWidthDp = resources.configuration.screenWidthDp
+        return when {
+            screenWidthDp >= 840 -> 4 // tablets and large screens
+            screenWidthDp >= 600 -> 3
+            else -> 2 // phones
+        }
+    }
+
 }

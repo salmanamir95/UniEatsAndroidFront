@@ -33,7 +33,7 @@
             android:id="@+id/totalAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total: $49.99"
+            android:text="Total: Rs 49.99"
             android:textSize="14sp"
             android:layout_marginTop="2dp" />
 
@@ -50,6 +50,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Items: 3 x Burger, 2 x Fries"
+            android:textSize="13sp"
+            android:layout_marginTop="8dp"
+            android:textColor="#555555" />
+
+        <TextView
+            android:id="@+id/orderTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Now"
             android:textSize="13sp"
             android:layout_marginTop="8dp"
             android:textColor="#555555" />
