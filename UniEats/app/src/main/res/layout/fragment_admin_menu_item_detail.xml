@@ -147,13 +147,14 @@
                             android:layout_height="wrap_content"
                             android:text="Edit"
                             style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_marginEnd="16dp" />
+                            android:layout_marginEnd="16dp"
+                            android:visibility="visible"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEditSave"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Edit"
+                            android:text="Save"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_marginEnd="16dp"
                             android:visibility="gone"/>

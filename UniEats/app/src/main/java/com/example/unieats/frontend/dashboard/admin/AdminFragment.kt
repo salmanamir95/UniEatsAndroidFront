@@ -48,7 +48,6 @@ class AdminFragment : Fragment() {
             when (it.itemId) {
                 R.id.nav_menu -> binding.viewPager.currentItem = 0
                 R.id.nav_orders -> binding.viewPager.currentItem = 1
-                R.id.nav_reviews -> binding.viewPager.currentItem = 2
                 R.id.nav_tables -> binding.viewPager.currentItem = 3
                 R.id.nav_users -> binding.viewPager.currentItem = 4
             }

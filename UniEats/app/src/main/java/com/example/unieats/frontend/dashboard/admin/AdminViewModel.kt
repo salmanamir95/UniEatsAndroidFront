@@ -11,7 +11,6 @@ import com.example.unieats.frontend.MainActivity
 
 class AdminViewModel(private val context: Context) : ViewModel() {
     val orderRepository = OrderRepository()
-    val reviewRepository = ReviewRepository()
     val tableRepository = TableRepository()
     val userRepository = UserRepository()
 }

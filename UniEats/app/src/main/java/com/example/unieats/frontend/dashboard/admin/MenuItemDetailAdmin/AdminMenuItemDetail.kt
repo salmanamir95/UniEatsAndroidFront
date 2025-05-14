@@ -1,6 +1,8 @@
 package com.example.unieats.frontend.dashboard.admin.MenuItemDetailAdmin
 
+import android.graphics.Bitmap.CompressFormat.*
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +10,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.unieats.backend.dbData.MenuItem
 import com.example.unieats.databinding.FragmentAdminMenuItemDetailBinding
 import com.example.unieats.frontend.dashboard.admin.SharedViewModels.MenuSharedViewModel
 import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
+import java.io.ByteArrayOutputStream
 
 class AdminMenuItemDetailFragment : DialogFragment() {
-
+    //Change Picture
     private lateinit var menuItem: MenuItemModel
     private var _binding: FragmentAdminMenuItemDetailBinding? = null
     private val binding get() = _binding!!
@@ -33,6 +37,8 @@ class AdminMenuItemDetailFragment : DialogFragment() {
         arguments?.let {
             menuItem = it.getParcelable("menuItem")!!
         }
+        item12 = ViewModelProvider(requireParentFragment())[AdminMenuItemViewModel::class.java]
+
         val sharedRepo = ViewModelProvider(requireActivity())[MenuSharedViewModel::class.java].data.value
         sharedRepo?.let {
             if (!item12.isInitialized()) item12.init(it)
@@ -66,11 +72,30 @@ class AdminMenuItemDetailFragment : DialogFragment() {
                     Log.d("Deleted", "Successfully")
                 else
                     Log.d("Deleted", "Unsuccessfully")
+                dismiss()
             }
         }
 
         binding.btnEditSave.setOnClickListener {
             toggleEditMode(false)
+            val outputStream = ByteArrayOutputStream()
+            menuItem.imageBitmap?.compress(JPEG, 70, outputStream)
+            val byteArray = outputStream.toByteArray()
+            val base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT)
+
+// Now use base64Image (not byteArray.toString())
+            val newModel = MenuItem(
+                menuItem.id,
+                binding.menuItemNameEdit.text.toString(),
+                binding.menuItemCategoryEdit.text.toString(),
+                binding.menuItemPriceEdit.text.toString().toDoubleOrNull() ?: 0.0,
+                binding.menuItemQuantityEdit.text.toString().toIntOrNull() ?: 0,
+                base64Image
+            )
+
+            item12.updateMenuItem(menuItem.id, newModel){
+                dismiss()
+            }
         }
 
 

@@ -7,7 +7,7 @@ import com.example.unieats.backend.dbData.MenuItem
 
 @Parcelize
 data class MenuItemModel(
-    val id: String = "",
+    var id: String = "",
     val name: String = "",
     val category: String = "",
     val price: Double = 0.0,

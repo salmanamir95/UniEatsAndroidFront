@@ -1,5 +1,7 @@
 package com.example.unieats.backend.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.unieats.backend.dbData.Order
 import com.example.unieats.backend.dbData.OrderStatus
 import com.google.firebase.database.*
@@ -7,6 +9,10 @@ import com.google.firebase.database.*
 class OrderRepository {
 
     private val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("orders")
+    private var allOrdersListener: ValueEventListener? = null
+
+    private val _orderLiveData = MutableLiveData<List<Order>>()
+    val orderLiveData: LiveData<List<Order>> = _orderLiveData
 
     // 1. Create Order
     fun createOrder(order: Order, onResult: (Boolean) -> Unit) {
@@ -55,20 +61,24 @@ class OrderRepository {
     }
 
     // 5. Observe All Orders (Real-Time)
-    fun observeAllOrders(onUpdate: (List<Order>) -> Unit): ValueEventListener {
-        val listener = object : ValueEventListener {
+    fun observeAllOrders() {
+        allOrdersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val orders = snapshot.children.mapNotNull { it.getValue(Order::class.java) }
-                onUpdate(orders)
+                _orderLiveData.postValue(orders)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                onUpdate(emptyList())
+                _orderLiveData.postValue(emptyList()) // Handle error
             }
         }
-        dbRef.addValueEventListener(listener)
-        return listener
+        dbRef.addValueEventListener(allOrdersListener!!)
     }
+
+    fun clearListeners() {
+        allOrdersListener?.let { dbRef.removeEventListener(it) }
+    }
+
 
     // 6. Observe Currently Processing Orders (Real-Time)
     fun observeProcessingOrders(onUpdate: (List<Order>) -> Unit): ValueEventListener {
