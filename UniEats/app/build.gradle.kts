@@ -1,9 +1,11 @@
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.services)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.hiltAndroid)
+    alias(libs.plugins.kotlinKapt)
     id("kotlin-parcelize")
 }
 
@@ -16,6 +18,7 @@ android {
             throw GradleException("local.properties file not found!")
         }
     }
+
     namespace = "com.example.unieats"
     compileSdk = 35
 
@@ -27,7 +30,6 @@ android {
         versionName = "1.0"
 
         val clientId = localProperties.getProperty("defaultWebClientId")
-
         if (clientId.isNullOrBlank()) {
             throw GradleException("defaultWebClientId is not defined in local.properties")
         } else {
@@ -50,7 +52,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -59,47 +60,45 @@ android {
         viewBinding = true
         dataBinding = true
     }
-
-
 }
 
 
+
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidxCoreKtx)
+    implementation(libs.androidxAppcompat)
+    implementation(libs.androidxActivity)
+    implementation(libs.androidxConstraintlayout)
+    implementation(libs.androidxFragmentKtx)
+    implementation(libs.androidxNavigationFragmentKtx)
+    implementation(libs.androidxNavigationUiKtx)
+    implementation(libs.androidxLifecycleViewmodelKtx)
+    implementation(libs.androidxLifecycleExtensions)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.database)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth.ktx)
+    implementation(libs.googleMaterial)
+    implementation(libs.androidxMaterial3)
 
-    // Google Sign-In
-    implementation ("com.google.android.gms:play-services-auth:21.0.0")
+    implementation(platform(libs.firebaseBom))
+    implementation(libs.firebaseAnalytics)
+    implementation(libs.firebaseDatabase)
+    implementation(libs.firebaseFirestore)
+    implementation(libs.firebaseAuth)
+    implementation(libs.firebaseStorage)
+    implementation(libs.firebaseAppcheckDebug)
 
-    // Room
-    implementation(libs.androidx.room.runtime.android)
+    implementation(libs.playServicesAuth)
 
-    implementation(libs.firebase.storage)
+    implementation(libs.androidxRoomRuntime)
+    kapt(libs.androidxRoomCompiler)
 
-    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.fragment:fragment-ktx:1.6.2") // or latest stable
-    // build.gradle (app)
-    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
-    // app/build.gradle
-    implementation ("com.google.firebase:firebase-appcheck:17.1.2")
-    implementation(libs.firebase.appcheck.debug)
-    implementation(libs.androidx.monitor)
-    implementation(libs.androidx.material3.android)
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    implementation ("com.cloudinary:cloudinary-android:2.3.1")
-    implementation(libs.androidx.media3.common.ktx)
-    //implementation ("com.google.android.material:material:1.11.0")
+    implementation(libs.hiltAndroid)
+    kapt(libs.hiltCompiler)
 
+    implementation(libs.coroutinesCore)
+    implementation(libs.coroutinesAndroid)
+
+    implementation(libs.media3Common)
+
+    implementation(libs.glide)
+    implementation(libs.cloudinary)
 }

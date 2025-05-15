@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -48,16 +49,18 @@ class MenuRepository(private val context: Context) {
                     imageUrl = base64Image
                 )
 
-                // Firebase operation should be on main thread
-                menuRef.child(menuItemId).setValue(updatedMenuItem)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("MenuRepository", "Item added successfully")
-                        } else {
-                            Log.e("MenuRepository", "Firebase error: ${task.exception?.message}")
+                // Firebase operation on main thread
+                withContext(Dispatchers.Main) {
+                    menuRef.child(menuItemId).setValue(updatedMenuItem)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("MenuRepository", "Item added successfully")
+                            } else {
+                                Log.e("MenuRepository", "Firebase error: ${task.exception?.message}")
+                            }
+                            callback(task.isSuccessful)
                         }
-                        callback(task.isSuccessful)
-                    }
+                }
             } catch (e: Exception) {
                 Log.e("MenuRepository", "Add menu item error: ${e.message}")
                 callback(false)
@@ -84,124 +87,93 @@ class MenuRepository(private val context: Context) {
         }
     }
 
-
     // READ
     // REAL-TIME LISTENER: Live updates without refresh
     fun observeMenuItems() {
-        menuRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
-            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                repositoryScope.launch {
-                    val tempList = mutableListOf<MenuItemModel>()
-                    val children = snapshot.children.toList()
+        repositoryScope.launch {
+            try {
+                menuRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+                    override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                        val tempList = mutableListOf<MenuItemModel>()
+                        val children = snapshot.children.toList()
 
-                    children.forEach { child ->
-                        val menuItem = child.getValue(MenuItem::class.java)
-                        menuItem?.let {
-                            MenuItemModel.fromMenuItem(it) { model ->
-                                tempList.add(model)
-                                if (tempList.size == children.size) {
-                                    _menuItemsLiveData.postValue(tempList)
+                        children.forEach { child ->
+                            val menuItem = child.getValue(MenuItem::class.java)
+                            menuItem?.let {
+                                MenuItemModel.fromMenuItem(it) { model ->
+                                    tempList.add(model)
+                                    if (tempList.size == children.size) {
+                                        _menuItemsLiveData.postValue(tempList)
+                                    }
                                 }
                             }
                         }
+
+                        // Handle empty state
+                        if (children.isEmpty()) {
+                            _menuItemsLiveData.postValue(emptyList())
+                        }
                     }
 
-                    // Handle empty state
-                    if (children.isEmpty()) {
+                    override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                        Log.e("MenuRepository", "Real-time listener cancelled: ${error.message}")
                         _menuItemsLiveData.postValue(emptyList())
                     }
-                }
+                })
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Observe MenuItems error: ${e.message}")
             }
-
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                Log.e("MenuRepository", "Real-time listener cancelled: ${error.message}")
-                _menuItemsLiveData.postValue(emptyList())
-            }
-        })
-
-
-
-    }
-
-    fun getMenuItemById(menuItemId: String, callback: (MenuItemModel?) -> Unit) {
-        menuRef.child(menuItemId).get().addOnSuccessListener { dataSnapshot ->
-            val menuItem = dataSnapshot.getValue(MenuItem::class.java)
-            menuItem?.let {
-                MenuItemModel.fromMenuItem(it) { model ->
-                    callback(model)
-                }
-            } ?: callback(null)
-        }.addOnFailureListener { exception ->
-            Log.e("MenuRepository", "Error fetching item by ID: ${exception.message}")
-            callback(null)
         }
     }
 
+    fun getMenuItemById(menuItemId: String, callback: (MenuItemModel?) -> Unit) {
+        repositoryScope.launch {
+            try {
+                val dataSnapshot = menuRef.child(menuItemId).get().await()
+                val menuItem = dataSnapshot.getValue(MenuItem::class.java)
+                menuItem?.let {
+                    MenuItemModel.fromMenuItem(it) { model ->
+                        callback(model)
+                    }
+                } ?: callback(null)
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Error fetching item by ID: ${e.message}")
+                callback(null)
+            }
+        }
+    }
 
     // UPDATE
     fun updateMenuItem(menuItemId: String, updatedMenuItem: MenuItem, callback: (Boolean) -> Unit) {
-        menuRef.child(menuItemId).setValue(updatedMenuItem)
-            .addOnCompleteListener { task ->
-                callback(task.isSuccessful)
+        repositoryScope.launch {
+            try {
+                menuRef.child(menuItemId).setValue(updatedMenuItem).await()
+                withContext(Dispatchers.Main) {
+                    callback(true)
+                }
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Update error: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    callback(false)
+                }
             }
+        }
     }
 
     // DELETE
     fun deleteMenuItem(menuItemId: String, callback: (Boolean) -> Unit) {
-        menuRef.child(menuItemId).removeValue()
-            .addOnCompleteListener { task ->
-                callback(task.isSuccessful)
-            }
-    }
-
-    fun updateMenuItem(model: MenuItemModel, callback: (Boolean) -> Unit) {
-        val menuItemId = model.id
-
-        if (menuItemId.isBlank()) {
-            Log.e("MenuRepository", "Update failed: ID is blank")
-            callback(false)
-            return
-        }
-
-        // Convert Bitmap to Base64
-        val base64Image = model.imageBitmap?.let { bitmap ->
+        repositoryScope.launch {
             try {
-                val outputStream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
-                val byteArray = outputStream.toByteArray()
-                Base64.encodeToString(byteArray, Base64.DEFAULT)
-            } catch (e: Exception) {
-                Log.e("MenuRepository", "Bitmap to Base64 conversion failed: ${e.message}")
-                null
-            }
-        }
-
-        if (base64Image == null) {
-            Log.e("MenuRepository", "Update failed: image conversion failed")
-            callback(false)
-            return
-        }
-
-        val updatedItem = MenuItem(
-            id = model.id,
-            name = model.name,
-            price = model.price,
-            category = model.category,
-            quantity = model.quantity,
-            imageUrl = base64Image
-        )
-
-        menuRef.child(menuItemId).setValue(updatedItem)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("MenuRepository", "Item updated successfully")
-                } else {
-                    Log.e("MenuRepository", "Update failed: ${task.exception?.message}")
+                menuRef.child(menuItemId).removeValue().await()
+                withContext(Dispatchers.Main) {
+                    callback(true)
                 }
-                callback(task.isSuccessful)
+            } catch (e: Exception) {
+                Log.e("MenuRepository", "Delete error: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    callback(false)
+                }
             }
+        }
     }
-
-
-
 }

@@ -1,78 +1,106 @@
 package com.example.unieats.backend.repository
 
 import com.example.unieats.backend.dbData.User
-import com.example.unieats.frontend.register.Register
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class UserRepository {
-    private val database = FirebaseDatabase.getInstance()
-    private val usersRef = database.getReference("users")
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val dbRef = FirebaseDatabase.getInstance().getReference("users")
 
-    fun registerUser(user: Register, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        auth.createUserWithEmailAndPassword(user.email, user.pass)
-            .addOnSuccessListener { authResult ->
-                val userId = authResult.user?.uid ?: run {
-                    onFailure(Exception("User ID not found"))
-                    return@addOnSuccessListener
-                }
-
-                val userWithId = User.fromRegistertoUser(user, userId)
-                usersRef.child(userId)
-                    .setValue(userWithId)
-                    .addOnSuccessListener { onSuccess() }
-                    .addOnFailureListener { onFailure(it) }
-            }
-            .addOnFailureListener { exception ->
-                onFailure(exception)
-            }
+    sealed class Result<out T> {
+        data class Success<out T>(val data: T) : Result<T>()
+        data class Error(val message: String) : Result<Nothing>()
     }
 
-    fun loginUser(
+    suspend fun registerUser(
         email: String,
         password: String,
-        onSuccess: (User) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener { authResult ->
-                authResult.user?.uid?.let { userId ->
-                    fetchUserFromDatabase(userId, onSuccess, onFailure)
-                } ?: onFailure("User ID not found")
-            }
-            .addOnFailureListener { exception ->
-                onFailure(exception.message ?: "Authentication failed")
-            }
+        name: String,
+        age: Int,
+        designation: String
+    ): Result<User> = withContext(Dispatchers.IO) {
+        try {
+            // Create authentication entry
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            val userId = authResult.user?.uid ?: return@withContext Result.Error("User creation failed")
+
+            // Create database entry
+            val user = User(
+                id = userId,
+                email = email,
+                name = name,
+                age = age,
+                designation = designation
+            )
+
+            dbRef.child(userId).setValue(user).await()
+            Result.Success(user)
+        } catch (e: FirebaseAuthException) {
+            Result.Error("Authentication error: ${e.message ?: "Unknown error"}")
+        } catch (e: Exception) {
+            Result.Error("Registration failed: ${e.message ?: "Unknown error"}")
+        }
     }
 
-    private fun fetchUserFromDatabase(
-        userId: String,
-        onSuccess: (User) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        usersRef.child(userId).get()
-            .addOnSuccessListener { snapshot ->
-                val user = snapshot.getValue(User::class.java)
-                    ?: return@addOnSuccessListener onFailure("User data not found")
-                onSuccess(user)
-            }
-            .addOnFailureListener { exception ->
-                onFailure(exception.message ?: "Database error")
-            }
+    suspend fun loginUser(email: String, password: String): Result<User> {
+        return try {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            val userId = authResult.user?.uid ?: return Result.Error("User not found")
+
+            val user = getUserFromDatabase(userId)
+                ?: return Result.Error("User data not found")
+
+            Result.Success(user)
+        } catch (e: FirebaseAuthException) {
+            Result.Error("Authentication error: ${e.message ?: "Unknown error"}")
+        } catch (e: Exception) {
+            Result.Error("Login failed: ${e.message ?: "Unknown error"}")
+        }
     }
 
-    fun updateUser(userId: String, updatedUser: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        usersRef.child(userId)
-            .setValue(updatedUser)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
+    private suspend fun getUserFromDatabase(userId: String): User? {
+        return try {
+            dbRef.child(userId).get().await().getValue(User::class.java)
+        } catch (e: Exception) {
+            null
+        }
     }
 
-    fun deleteUser(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        usersRef.child(userId)
-            .removeValue()
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
+    suspend fun updateUser(user: User): Result<Unit> {
+        return try {
+            dbRef.child(user.id).setValue(user).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error("Update failed: ${e.message ?: "Unknown error"}")
+        }
+    }
+
+    suspend fun deleteUser(userId: String): Result<Unit> {
+        return try {
+            // Delete from authentication
+            auth.currentUser?.delete()?.await()
+
+            // Delete from database
+            dbRef.child(userId).removeValue().await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error("Deletion failed: ${e.message ?: "Unknown error"}")
+        }
+    }
+
+    suspend fun getCurrentUser(): User? {
+        return auth.currentUser?.uid?.let { userId ->
+            try {
+                dbRef.child(userId).get().await().getValue(User::class.java)
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }

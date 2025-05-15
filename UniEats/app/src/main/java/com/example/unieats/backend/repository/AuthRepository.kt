@@ -10,14 +10,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-class AuthRepository(private val activity: Activity) {
+class AuthRepository(
+    private val activity: Activity,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Google Sign-In Client setup
+    // Google Sign-In Client setup (lightweight operation, no need for coroutine)
     fun getGoogleSignInClient(): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(activity.getString(R.string.default_web_client_id))
@@ -27,31 +35,49 @@ class AuthRepository(private val activity: Activity) {
         return GoogleSignIn.getClient(activity, gso)
     }
 
-    // Handle Google Sign-In result
-    fun handleGoogleSignInResult(data: Intent?, onSuccess: (FirebaseUser) -> Unit, onFailure: (String) -> Unit) {
-        val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            val idToken = account.idToken ?: run {
-                onFailure("Null ID token from Google")
-                return
+    // Converted to suspend function for coroutine usage
+    suspend fun handleGoogleSignInResult(data: Intent?): Result<FirebaseUser> {
+        return try {
+            val account = withContext(ioDispatcher) {
+                getGoogleAccount(data)
             }
 
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth.signInWithCredential(credential)
-                .addOnSuccessListener { result ->
-                    result.user?.let { user ->
-                        onSuccess(user)
-                    } ?: run {
-                        onFailure("User authentication succeeded but user is null")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    onFailure("Google sign-in failed: ${exception.message}")
-                }
+            val user = withContext(ioDispatcher) {
+                firebaseAuthWithGoogle(account)
+            }
 
-        } catch (e: ApiException) {
-            onFailure("Google Sign-In failed with error: ${e.statusCode}")
+            Result.Success(user)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
+
+    private suspend fun getGoogleAccount(data: Intent?): GoogleSignInAccount {
+        return try {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            task.await()
+        } catch (e: Exception) {
+            throw when (e) {
+                is ApiException -> GoogleSignInException("Google Sign-In failed: ${e.statusCode}", e)
+                else -> GoogleSignInException("Google Sign-In failed", e)
+            }
+        }
+    }
+
+    private suspend fun firebaseAuthWithGoogle(account: GoogleSignInAccount): FirebaseUser {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        val authResult = auth.signInWithCredential(credential).await()
+
+        return authResult.user ?: throw FirebaseAuthException(
+            "User authentication succeeded but user is null",
+            "Null user object"
+        )
+    }
+
+    sealed class Result<out T> {
+        data class Success<out T>(val data: T) : Result<T>()
+        data class Error(val exception: Exception) : Result<Nothing>()
+    }
+
+    class GoogleSignInException(message: String, cause: Exception) : Exception(message, cause)
 }

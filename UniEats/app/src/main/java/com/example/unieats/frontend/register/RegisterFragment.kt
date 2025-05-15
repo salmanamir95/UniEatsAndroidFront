@@ -6,18 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.unieats.R
 import com.example.unieats.backend.repository.UserRepository
-import com.example.unieats.frontend.login.loginFragment
+import com.example.unieats.frontend.login.LoginFragment
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
+    private val viewModel: RegisterViewModel by viewModels()
     private var selectedDesignation: String = ""
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.fragment_register, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,10 +38,11 @@ class RegisterFragment : Fragment() {
         spinner.adapter = adapter
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+            ) {
                 selectedDesignation = if (position == 0) "" else options[position]
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 selectedDesignation = ""
             }
@@ -44,7 +50,7 @@ class RegisterFragment : Fragment() {
 
         view.findViewById<Button>(R.id.logreg).setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, loginFragment())
+                .replace(R.id.fragment_container, LoginFragment())
                 .commit()
         }
 
@@ -53,7 +59,6 @@ class RegisterFragment : Fragment() {
             val pass = view.findViewById<EditText>(R.id.passReg).text.toString().trim()
             val name = view.findViewById<EditText>(R.id.nameReg).text.toString().trim()
             val ageText = view.findViewById<EditText>(R.id.ageReg).text.toString().trim()
-
             val age = ageText.toIntOrNull()
 
             when {
@@ -70,21 +75,28 @@ class RegisterFragment : Fragment() {
                     Toast.makeText(context, "Age must be between 17 and 79", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    val user = Register(email, name, pass, age, selectedDesignation)
-                    val repository = UserRepository()
+                    viewModel.registerUser(email, pass, name, age, selectedDesignation)
+                }
+            }
+        }
 
-                    repository.registerUser(
-                        user,
-                        onSuccess = {
-                            Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.fragment_container, loginFragment())
-                                .commit()
-                        },
-                        onFailure = {
-                            Toast.makeText(context, "Registration failed: ${it.message}", Toast.LENGTH_LONG).show()
-                        }
-                    )
+        // Observe ViewModel State
+        lifecycleScope.launch {
+            viewModel.registerState.collectLatest { state ->
+                when (state) {
+                    is RegisterState.Loading -> {
+                        Toast.makeText(context, "Registering...", Toast.LENGTH_SHORT).show()
+                    }
+                    is RegisterState.Success -> {
+                        Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, LoginFragment())
+                            .commit()
+                    }
+                    is RegisterState.Error -> {
+                        Toast.makeText(context, "Registration failed: ${state.message}", Toast.LENGTH_LONG).show()
+                    }
+                    else -> { /* idle or no-op */ }
                 }
             }
         }

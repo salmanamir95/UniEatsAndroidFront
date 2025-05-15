@@ -3,82 +3,95 @@ package com.example.unieats.backend.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.unieats.backend.dbData.Table
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 class TableRepository {
 
     private val dbRef = FirebaseDatabase.getInstance().getReference("tables")
-
-    // LiveData to expose the tables list
     private val _tablesLiveData = MutableLiveData<List<Table>>()
     val tablesLiveData: LiveData<List<Table>> = _tablesLiveData
 
-    // To store the listener and remove it later if needed
+    private val activeListener = AtomicBoolean(false)
     private var tablesListener: ValueEventListener? = null
 
-    // Observe tables in real-time in background thread (via Dispatchers.IO)
     fun observeTables() {
+        if (activeListener.getAndSet(true)) {
+            removeListener() // Prevent multiple active listeners
+        }
+
         tablesListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // Switch to the IO dispatcher for the intensive operation of mapping and updating LiveData
-                snapshot.children.mapNotNull { it.getValue(Table::class.java) }.also { tables ->
-                    _tablesLiveData.postValue(tables) // Update the LiveData with tables on the main thread
-                }
+                processSnapshot(snapshot)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                _tablesLiveData.postValue(emptyList()) // Handle error (you can customize this)
+                handleDatabaseError(error)
             }
         }
 
-        // Adding listener on the database should be done on the main thread, but the data processing happens on the IO thread
-        dbRef.addValueEventListener(tablesListener!!)
-    }
-
-    // Create a new table (Add table) in background thread
-    suspend fun createTable(table: Table) {
-        withContext(Dispatchers.IO) {
-            val tableId = dbRef.push().key ?: return@withContext
-            val tableWithId = table.copy(id = tableId) // Assign generated ID to the table
-            dbRef.child(tableId).setValue(tableWithId) // Save the table to Firebase with a new ID
+        tablesListener?.let {
+            dbRef.addValueEventListener(it)
         }
     }
 
-    // Update a table's details (e.g., reserve table or change seats) in background thread
-    suspend fun updateTable(tableId: String, updatedTable: Table) {
-        withContext(Dispatchers.IO) {
-            dbRef.child(tableId).setValue(updatedTable) // Update the table in Firebase
+    private fun processSnapshot(snapshot: DataSnapshot) {
+        val tables = mutableListOf<Table>()
+        for (child in snapshot.children) {
+            child.getValue(Table::class.java)?.let { table ->
+                tables.add(table)
+            }
+        }
+        _tablesLiveData.postValue(tables)
+    }
+
+    private fun handleDatabaseError(error: DatabaseError) {
+        _tablesLiveData.postValue(emptyList())
+        // Consider adding proper error logging/handling here
+    }
+
+    suspend fun createTable(table: Table): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val tableId = dbRef.push().key ?: return@withContext false
+            dbRef.child(tableId).setValue(table.copy(id = tableId)).await()
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 
-    // Reserve a table in background thread (this is an update operation)
-    suspend fun reserveTable(tableId: String, studentId: String?) {
-        withContext(Dispatchers.IO) {
-            val updatedTable = Table(
-                id = tableId,
-                reservedBy = studentId,
-                number = 0, // No need to update the number
-                seats = 4 // Seats won't change for a reservation
-            )
-            dbRef.child(tableId).setValue(updatedTable) // Update the table with reservation status
+    suspend fun updateTable(tableId: String, updates: Map<String, Any?>): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                dbRef.child(tableId).updateChildren(updates).await()
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
     }
 
-    // Remove a table (Delete operation) in background thread
-    suspend fun deleteTable(tableId: String) {
-        withContext(Dispatchers.IO) {
-            dbRef.child(tableId).removeValue() // Removes the table node from Firebase
+    suspend fun reserveTable(tableId: String, studentId: String?): Boolean {
+        return updateTable(tableId, mapOf("reservedBy" to studentId))
+    }
+
+    suspend fun deleteTable(tableId: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            dbRef.child(tableId).removeValue().await()
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 
-    // Remove the listener when no longer needed
     fun removeListener() {
-        tablesListener?.let { dbRef.removeEventListener(it) }
-        tablesListener = null
+        tablesListener?.let {
+            dbRef.removeEventListener(it)
+            activeListener.set(false)
+            tablesListener = null
+        }
     }
 }

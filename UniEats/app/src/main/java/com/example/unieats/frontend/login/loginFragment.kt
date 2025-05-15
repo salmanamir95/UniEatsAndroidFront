@@ -4,82 +4,116 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.unieats.R
 import com.example.unieats.backend.repository.UserRepository
+import com.example.unieats.databinding.FragmentLoginBinding
 import com.example.unieats.frontend.dashboard.AppUser
 import com.example.unieats.frontend.dashboard.UserNavigator
 import com.example.unieats.frontend.register.RegisterFragment
+import com.example.unieats.utils.EmailValidator
+import com.example.unieats.utils.PasswordValidator
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class loginFragment: Fragment() {
-    private lateinit var email : String
-    private lateinit var pass : String
-    private lateinit var logBtn : Button
-    private lateinit var regBtn : Button
+@AndroidEntryPoint
+class LoginFragment : Fragment() {
+
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+
+    @Inject
+    lateinit var userRepository: UserRepository
+
+    private val viewModel: LoginViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupClickListeners()
+        observeViewModel()
+    }
+
+    private fun setupClickListeners() {
+        binding.loginBtn.setOnClickListener {
+            val email = binding.emailInput.text.toString()
+            val password = binding.passwordInput.text.toString()
+
+            if (validateInputs(email, password)) {
+                viewModel.loginUser(email, password)
+            }
+        }
+
+        binding.regBtn.setOnClickListener {
+            // Navigation code
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.loginState.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is LoginState.Loading -> showLoading(true)
+                is LoginState.Success -> LoginState.Success(state.user)
+                is LoginState.Error -> LoginState.Error(state.message)
+            }
+        }
+    }
 
     private fun validateInputs(email: String, password: String): Boolean {
-        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
-        val passwordPattern = ".{6,}".toRegex()
-
         return when {
-            email.isEmpty() || password.isEmpty() -> {
-                Toast.makeText(context, "Complete the Required Fields", Toast.LENGTH_SHORT).show()
+            !EmailValidator.isValid(email) -> {
+                showError("Invalid email format")
                 false
             }
-            !email.matches(emailPattern) -> {
-                Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
-                false
-            }
-            !password.matches(passwordPattern) -> {
-                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+            !PasswordValidator.isValid(password) -> {
+                showError("Password must be at least 6 characters")
                 false
             }
             else -> true
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_login, container, false)
+    private fun handleLoginSuccess(user: AppUser) {
+        showLoading(false)
+        Toast.makeText(requireContext(), "Welcome ${user.name}", Toast.LENGTH_LONG).show()
+        UserNavigator.navigateToDashboard(user, parentFragmentManager)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        regBtn = view.findViewById(R.id.regBtn)
-        logBtn = view.findViewById(R.id.loginBtn)
-        logBtn.setOnClickListener {
-            val email = view.findViewById<EditText>(R.id.email).text.toString().trim()
-            val password = view.findViewById<EditText>(R.id.pass).text.toString().trim()
+    private fun handleLoginError(errorMessage: String) {
+        showLoading(false)
+        showError(errorMessage)
+    }
 
-            if (validateInputs(email, password)) {
-                val repository = UserRepository()
-                repository.loginUser(
-                    email = email,
-                    password = password,
-                    onSuccess = { user ->
-                        Toast.makeText(context, "Welcome ${user.name}", Toast.LENGTH_LONG).show()
-                        // Add navigation logic here
-                        val foundData = AppUser.from(user)
-                        UserNavigator.navigateToDashboard(foundData,parentFragmentManager)
-                    },
-                    onFailure = { errorMsg ->
-                        Toast.makeText(context, "Login failed: $errorMsg", Toast.LENGTH_LONG).show()
-                    }
-                )
-            }
-        }
+    private fun showLoading(isLoading: Boolean) {
+        binding.loginBtn.isEnabled = !isLoading
+        binding.loginBtn.text = if (isLoading) "..." else "Welcome"
+    }
 
-        regBtn.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, RegisterFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun navigateToRegistration() {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, RegisterFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

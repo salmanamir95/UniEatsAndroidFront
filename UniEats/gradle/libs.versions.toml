@@ -3,52 +3,65 @@ agp = "8.8.0"
 kotlin = "2.1.10"
 coreKtx = "1.16.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
+androidxTestExtJunit = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
+material3 = "1.2.1"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-roomRuntimeAndroid = "2.7.1"
+room = "2.7.1"
+firebaseBom = "33.13.1"
 firebaseAnalytics = "21.6.1"
 firebaseDatabase = "21.0.0"
 firebaseFirestore = "25.1.4"
 googleServices = "4.4.2"
-firebaseAuthKtx = "23.2.0"
+firebaseAuth = "23.2.0"
 firebaseStorage = "20.3.0"
-firebaseAppcheckDebug = "18.0.0"
-monitor = "1.7.2"
-junitJunit = "4.12"
-junitKtx = "1.2.1"
-testng = "6.9.6"
-material3Android = "1.3.2"
-media3CommonKtx = "1.6.1"
+firebaseAppcheck = "18.0.0"
+navigation = "2.7.7"
+lifecycle = "2.8.0"
+lifecycleExtensions = "2.2.0"
+fragment = "1.6.2"
+hilt = "2.51.1"
+coroutines = "1.8.0"
+glide = "4.16.0"
+cloudinary = "2.3.1"
+media3 = "1.6.1"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntimeAndroid" }
-
-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebaseAnalytics" }
-firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabase" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
-firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorage" }
-firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug", version.ref = "firebaseAppcheckDebug" }
-androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
-junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
-androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
-testng = { group = "org.testng", name = "testng", version.ref = "testng" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
-androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
+androidxCoreKtx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidxAppcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidxActivity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidxConstraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidxLifecycleViewmodelKtx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidxLifecycleExtensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version.ref = "lifecycleExtensions" }
+androidxFragmentKtx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
+androidxNavigationFragmentKtx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
+androidxNavigationUiKtx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
+androidxRoomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidxRoomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+googleMaterial = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidxMaterial3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+firebaseBom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebaseAnalytics = { group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebaseAnalytics" }
+firebaseDatabase = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabase" }
+firebaseFirestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+firebaseAuth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
+firebaseStorage = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorage" }
+firebaseAppcheckDebug = { group = "com.google.firebase", name = "firebase-appcheck-debug", version.ref = "firebaseAppcheck" }
+coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hiltCompiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+cloudinary = { group = "com.cloudinary", name = "cloudinary-android", version.ref = "cloudinary" }
+media3Common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
+playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version = "21.0.0" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinKapt = { id = "org.jetbrains.kotlin.kapt" }
+hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
