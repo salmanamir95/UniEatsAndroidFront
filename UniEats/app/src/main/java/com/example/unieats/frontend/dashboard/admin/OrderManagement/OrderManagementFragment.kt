@@ -13,35 +13,44 @@ import com.example.unieats.frontend.dashboard.admin.SharedViewModels.OrderShared
 
 
 class OrderManagementFragment : Fragment() {
-    private var _binding : FragmentOrderManagementBinding? = null
+    private var _binding: FragmentOrderManagementBinding? = null
     private lateinit var orderAdapter: OrderManagementAdapter
-    private  val orderVM : OrderManagementViewModel by viewModels()
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val orderVM: OrderManagementViewModel by viewModels()
+    private var repositoryInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentOrderManagementBinding.inflate(inflater, container,false)
-        val SharedRepo = ViewModelProvider(requireActivity())[OrderSharedViewModel::class.java].data.value
-        SharedRepo?.let{
-            if (!orderVM.isInitialized())  orderVM.init(SharedRepo)
-        }
-        orderAdapter= OrderManagementAdapter()
+    ): View {
+        _binding = FragmentOrderManagementBinding.inflate(inflater, container, false)
+        val sharedViewModel = ViewModelProvider(requireActivity())[OrderSharedViewModel::class.java]
+
+        orderAdapter = OrderManagementAdapter()
 
         _binding!!.recyclerViewOrdersAdmin.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = orderAdapter
         }
-        orderVM._orders.observe(viewLifecycleOwner){
-            item -> orderAdapter.submitList(item)
+
+        sharedViewModel.data.observe(viewLifecycleOwner) { repo ->
+            repo?.let {
+                if (!repositoryInitialized) {
+                    orderVM.init(it)
+                    repositoryInitialized = true
+                    // Start observing orders only after initialization
+                    orderVM.orders.observe(viewLifecycleOwner) { items ->
+                        orderAdapter.submitList(items)
+                    }
+                }
+            }
         }
 
         return _binding!!.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

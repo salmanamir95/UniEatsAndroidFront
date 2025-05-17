@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.unieats.backend.dbData.MenuItem
-import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
+import com.example.unieats.frontend.dashboard.Student.Menu.MenuItemModel
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

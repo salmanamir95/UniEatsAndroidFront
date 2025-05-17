@@ -19,10 +19,9 @@ class TableRepository {
     private var tablesListener: ValueEventListener? = null
 
     fun observeTables() {
-        if (activeListener.getAndSet(true)) {
-            removeListener() // Prevent multiple active listeners
-        }
+        if (activeListener.get()) return // Already observing
 
+        activeListener.set(true)
         tablesListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 processSnapshot(snapshot)
@@ -33,10 +32,9 @@ class TableRepository {
             }
         }
 
-        tablesListener?.let {
-            dbRef.addValueEventListener(it)
-        }
+        dbRef.addValueEventListener(tablesListener!!)
     }
+
 
     private fun processSnapshot(snapshot: DataSnapshot) {
         val tables = mutableListOf<Table>()

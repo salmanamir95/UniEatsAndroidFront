@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.unieats.R
-import com.example.unieats.frontend.login.loginFragment
 import com.google.firebase.FirebaseApp
+import com.example.unieats.frontend.login.LoginFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         // Only load the fragment if it's the first time (when savedInstanceState is null)
         if (savedInstanceState == null) {
-            loadFragment(loginFragment()) // Ensure the container ID matches your XML layout
+            loadFragment(LoginFragment()) // Ensure the container ID matches your XML layout
         }
     }
 

@@ -83,6 +83,8 @@ class OrderRepository {
 
     // 5. Observe All Orders (Real-Time)
     fun observeAllOrders() {
+        if (allOrdersListener != null) return // Already observing
+
         allOrdersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 repositoryScope.launch {
@@ -93,12 +95,13 @@ class OrderRepository {
 
             override fun onCancelled(error: DatabaseError) {
                 repositoryScope.launch {
-                    _orderLiveData.postValue(emptyList()) // Handle error
+                    _orderLiveData.postValue(emptyList())
                 }
             }
         }
         dbRef.addValueEventListener(allOrdersListener!!)
     }
+
 
     fun clearListeners() {
         allOrdersListener?.let { dbRef.removeEventListener(it) }

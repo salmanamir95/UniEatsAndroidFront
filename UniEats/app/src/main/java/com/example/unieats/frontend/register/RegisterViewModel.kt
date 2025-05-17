@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 sealed class RegisterState {
     object Idle : RegisterState()
@@ -17,7 +16,7 @@ sealed class RegisterState {
     data class Error(val message: String) : RegisterState()
 }
 
-class RegisterViewModel @Inject constructor(
+class RegisterViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -28,7 +27,7 @@ class RegisterViewModel @Inject constructor(
         _registerState.value = RegisterState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             val result = userRepository.registerUser(email, password, name, age, designation)
-            _registerState.value = when(result) {
+            _registerState.value = when (result) {
                 is UserRepository.Result.Success -> RegisterState.Success(result.data)
                 is UserRepository.Result.Error -> RegisterState.Error(result.message)
             }

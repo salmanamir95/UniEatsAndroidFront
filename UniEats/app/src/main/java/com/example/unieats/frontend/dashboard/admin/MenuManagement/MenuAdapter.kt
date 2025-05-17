@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.unieats.databinding.ItemMenuBinding
-import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
+import com.example.unieats.frontend.dashboard.Student.Menu.MenuItemModel
 
 class MenuAdapter(private val onItemClick: (MenuItemModel) -> Unit) :
     ListAdapter<MenuItemModel, MenuAdapter.MenuViewHolder>(MenuDiffCallback()) {
@@ -27,7 +27,7 @@ class MenuAdapter(private val onItemClick: (MenuItemModel) -> Unit) :
             binding.menuItemName.text = menuItem.name
             binding.menuItemPrice.text = "$${menuItem.price}"
             Glide.with(binding.root.context)
-                .load(menuItem.imageBitmap)
+                .load(menuItem.image)
                 .into(binding.menuItemImage)
 
             // Detect the item click

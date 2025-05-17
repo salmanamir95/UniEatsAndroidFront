@@ -4,17 +4,14 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.unieats.backend.dbData.MenuItem
 import com.example.unieats.backend.repository.MenuRepository
-import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.unieats.frontend.dashboard.Student.Menu.MenuItemModel
 
 class MenuManageViewModel : ViewModel() {
-     lateinit var repository: MenuRepository
+    private lateinit var repository: MenuRepository
 
-     val _menuItems = MutableLiveData<List<MenuItemModel>>()
+    private val _menuItems = MutableLiveData<List<MenuItemModel>>()
     val menuItems: LiveData<List<MenuItemModel>> get() = _menuItems
 
     fun isInitialized(): Boolean = this::repository.isInitialized
@@ -22,28 +19,25 @@ class MenuManageViewModel : ViewModel() {
     fun init(repo: MenuRepository) {
         if (!this::repository.isInitialized) {
             repository = repo
-            repo.menuItemsLiveData.observeForever {
+
+            // Start observing menu items from Firebase
+            repository.observeMenuItems()
+
+            // Observe repository's LiveData and post to ViewModel LiveData
+            repository.menuItemsLiveData.observeForever {
                 _menuItems.postValue(it)
             }
-            loadMenuItems()
         }
     }
 
-    fun loadMenuItems() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.observeMenuItems()
-        }
-    }
-
-    // In MenuManageViewModel
     fun addMenuItem(menuItemAdmin: MenuItemAdmin, imageUri: Uri, callback: (Boolean) -> Unit) {
-        if (this::repository.isInitialized) {
+        if (isInitialized()) {
             val menuItem = MenuItem(
                 name = menuItemAdmin.name,
                 category = menuItemAdmin.category,
                 price = menuItemAdmin.price,
                 quantity = menuItemAdmin.quantity,
-                imageUrl = "" // Temporarily empty, set after upload
+                imageUrl = "" // Placeholder, gets filled after image processing
             )
             repository.addMenuItem(menuItem, imageUri, callback)
         } else {
@@ -51,12 +45,11 @@ class MenuManageViewModel : ViewModel() {
         }
     }
 
-
-
     fun deleteMenuItem(itemId: String, callback: (Boolean) -> Unit) {
-        repository.deleteMenuItem(itemId, callback)
+        if (isInitialized()) {
+            repository.deleteMenuItem(itemId, callback)
+        } else {
+            callback(false)
+        }
     }
-
-
-
 }

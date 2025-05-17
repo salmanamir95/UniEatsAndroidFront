@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="reservationStatus" type="id">reservationValue</item>
+    <item name="reservationStatus" type="id"/>
 </resources>

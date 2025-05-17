@@ -7,10 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.unieats.backend.repository.UserRepository
 import com.example.unieats.frontend.dashboard.AppUser
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 // LoginViewModel.kt
-class LoginViewModel @Inject constructor(
+class LoginViewModel (
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _loginState = MutableLiveData<LoginState>()

@@ -1,33 +1,30 @@
 package com.example.unieats.frontend.dashboard.admin.OrderManagement
 
-import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.unieats.backend.dbData.Order
 import com.example.unieats.backend.repository.OrderRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class OrderManagementViewModel : ViewModel() {
-    lateinit var repository: OrderRepository
-    lateinit var _orders: MutableLiveData<List<Order>>
+    private val _orders = MutableLiveData<List<Order>>()
+    val orders: LiveData<List<Order>> get() = _orders
 
-    fun isInitialized(): Boolean = this::repository.isInitialized
+    private var initialized = false
 
-    fun init(repo : OrderRepository){
-        if(!this.isInitialized()){
-            repository = repo
-            repo.orderLiveData.observeForever{
-                _orders.postValue(it)
-            }
+    fun init(repo: OrderRepository) {
+        if (initialized) return
+        initialized = true
+
+        repo.observeAllOrders()
+        repo.orderLiveData.observeForever {
+            _orders.postValue(it)
         }
-    }
 
-    fun loadOrderItems(){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.observeAllOrders()
-        }
+        // Optional: store repo reference only if you need to call clearListeners()
     }
 
 }
+
+
+

@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.unieats.backend.dbData.MenuItem
 import com.example.unieats.databinding.FragmentAdminMenuItemDetailBinding
 import com.example.unieats.frontend.dashboard.admin.SharedViewModels.MenuSharedViewModel
-import com.example.unieats.frontend.dashboard.student.Menu.MenuItemModel
+import com.example.unieats.frontend.dashboard.Student.Menu.MenuItemModel
 import java.io.ByteArrayOutputStream
 
 class AdminMenuItemDetailFragment : DialogFragment() {
@@ -35,7 +35,9 @@ class AdminMenuItemDetailFragment : DialogFragment() {
         _binding = FragmentAdminMenuItemDetailBinding.inflate(inflater, container, false)
 
         arguments?.let {
-            menuItem = it.getParcelable("menuItem")!!
+            menuItem = requireNotNull(it.getParcelable("menuItem") as? MenuItemModel) {
+                "menuItem is missing or of the wrong type"
+            }
         }
         item12 = ViewModelProvider(requireParentFragment())[AdminMenuItemViewModel::class.java]
 
@@ -57,7 +59,7 @@ class AdminMenuItemDetailFragment : DialogFragment() {
         binding.menuItemQuantityEdit.setText(menuItem.quantity.toString())
 
         Glide.with(requireContext())
-            .load(menuItem.imageBitmap)
+            .load(menuItem.image)
             .into(binding.menuItemImage)
 
         // Handle Edit Button Click
@@ -79,7 +81,7 @@ class AdminMenuItemDetailFragment : DialogFragment() {
         binding.btnEditSave.setOnClickListener {
             toggleEditMode(false)
             val outputStream = ByteArrayOutputStream()
-            menuItem.imageBitmap?.compress(JPEG, 70, outputStream)
+            menuItem.image?.compress(JPEG, 70, outputStream)
             val byteArray = outputStream.toByteArray()
             val base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT)
 

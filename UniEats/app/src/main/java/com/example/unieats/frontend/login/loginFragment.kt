@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.unieats.R
 import com.example.unieats.backend.repository.UserRepository
 import com.example.unieats.databinding.FragmentLoginBinding
@@ -16,20 +14,13 @@ import com.example.unieats.frontend.dashboard.UserNavigator
 import com.example.unieats.frontend.register.RegisterFragment
 import com.example.unieats.utils.EmailValidator
 import com.example.unieats.utils.PasswordValidator
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    @Inject
-    lateinit var userRepository: UserRepository
-
-    private val viewModel: LoginViewModel by viewModels()
+    private lateinit var viewModel: LoginViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +33,7 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = LoginViewModel(UserRepository())
         setupClickListeners()
         observeViewModel()
     }
@@ -57,7 +49,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.regBtn.setOnClickListener {
-            // Navigation code
+            navigateToRegistration()
         }
     }
 
@@ -65,8 +57,8 @@ class LoginFragment : Fragment() {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when(state) {
                 is LoginState.Loading -> showLoading(true)
-                is LoginState.Success -> LoginState.Success(state.user)
-                is LoginState.Error -> LoginState.Error(state.message)
+                is LoginState.Success -> handleLoginSuccess(state.user)
+                is LoginState.Error -> handleLoginError(state.message)
             }
         }
     }
