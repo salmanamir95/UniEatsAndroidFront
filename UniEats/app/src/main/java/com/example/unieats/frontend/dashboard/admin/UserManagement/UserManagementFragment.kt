@@ -25,7 +25,9 @@ class UserManagementFragment: Fragment() {
         binding.userTitle.text = "User Management Screen"
 
         val sharedRepo = ViewModelProvider(requireActivity())[UserSharedViewModel::class.java]
-
+        sharedRepo.data.observe(viewLifecycleOwner){
+            repo->
+        }
         return binding.root
     }
 

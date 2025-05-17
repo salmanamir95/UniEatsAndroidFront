@@ -1,5 +1,8 @@
 package com.example.unieats.backend.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.unieats.backend.dbData.Table
 import com.example.unieats.backend.dbData.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -12,6 +15,8 @@ import java.lang.Exception
 class UserRepository {
     private val auth = FirebaseAuth.getInstance()
     private val dbRef = FirebaseDatabase.getInstance().getReference("users")
+    private val _usersLiveData = MutableLiveData<List<User>>()
+    val usersLiveData: LiveData<List<User>> = _usersLiveData
 
     sealed class Result<out T> {
         data class Success<out T>(val data: T) : Result<T>()
@@ -101,6 +106,17 @@ class UserRepository {
             } catch (e: Exception) {
                 null
             }
+        }
+    }
+
+    suspend fun observeUsers(): List<User>? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val snapshot = dbRef.get().await()
+            val userList = snapshot.children.mapNotNull { it.getValue(User::class.java) }
+            _usersLiveData.postValue(userList)
+            userList
+        } catch (e: Exception) {
+            null
         }
     }
 }
